@@ -1,0 +1,26 @@
+.AuthButton{
+    background-color: rgb(65, 67, 66);
+    color: white;
+    padding: 10px;
+}
+
+.iconWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.iconStyle {
+  width: 20px;
+  height: 20px;
+}
+
+.pageIcon {
+  width: 40px;
+  height: 40px;
+}
+
+.box-shadow{
+     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}

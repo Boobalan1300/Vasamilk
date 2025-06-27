@@ -1,0 +1,113 @@
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('./assets/Fonts/Outfit-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('./assets/Fonts/Outfit-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('./assets/Fonts/Outfit-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+
+body {
+  font-family: 'Outfit', sans-serif;
+}
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+
+.bg-yellow{
+  background-color: rgb(234, 211, 80);
+}
+.text-white{
+  color: white;
+}
+
+
+/* 53379C */
+
+.ant-layout-sider.custom-sider {
+  background-color: #1C2939 !important;
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu {
+  background-color: #1C2939 !important;
+  color: #ffff !important;
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu-item {
+  color: #ffff !important;
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu-item:hover {
+  background-color: #344153 !important;
+  color: #ffffff !important;
+ 
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu-item-selected {
+  background-color: #344153 !important;
+  color: #ffffff !important;
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu-item .anticon {
+  color: #ffffff !important;
+}
+
+
+
+/* 
+
+.ant-layout-sider.custom-sider {
+  background-color: #eafaf1 !important;
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu {
+  background-color: #eafaf1 !important;
+  color: #2c3e50 !important;
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu-item {
+  color: #2c3e50 !important;
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu-item:hover {
+  background-color: #c8e6d0 !important;
+  color: #ffffff !important;
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu-item-selected {
+  background-color: #a0d8b3 !important;
+  color: #ffffff !important;
+}
+
+
+.ant-layout-sider.custom-sider .ant-menu-item .anticon {
+  color: #2c3e50 !important;
+} */

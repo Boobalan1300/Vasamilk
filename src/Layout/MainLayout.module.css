@@ -1,0 +1,54 @@
+
+.layout {
+  min-height: 100vh;
+  background: #f0f2f5;
+}
+
+.innerLayout {
+  min-height: 100vh;
+  background: #fff;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  will-change: margin-left, width;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 64px;
+  line-height: 64px;
+  background: #fff;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: left 0.2s ease;
+  will-change: left;
+  user-select: none;
+}
+
+.toggleButton {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin: 0;
+  color: #1C2939;
+  transition: color 0.2s ease;
+  border-radius: 4px;
+  user-select: none;
+}
+
+
+.content {
+  margin-top: 64px;
+  padding: 10px;
+  min-height: calc(100vh - 64px);
+  overflow-y: auto;
+  background: #fff;
+}
