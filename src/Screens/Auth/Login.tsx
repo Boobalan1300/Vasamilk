@@ -144,7 +144,7 @@ const Login = () => {
                 </span>
               </div>
 
-              <CustomButton type="submit"  className="mt-3  AuthButton">
+              <CustomButton type="submit"  className="mt-3 w-100 AuthButton">
                 Sign In
               </CustomButton>
             </form>

@@ -12,6 +12,7 @@ import { setEncryptedCookie } from "../../Utils/Cookie";
 
 import "../../Styles/Common.css";
 import '../../Styles/FromFields.css'
+import CustomButton from "../../Components/Button";
 
 const { Title } = Typography;
 
@@ -116,9 +117,9 @@ const ForgetPassword = () => {
                   Back to Login
                 </span>
               </div>
-              <Button htmlType="submit" block className="AuthButton mt-3">
+              <CustomButton type="submit"  className="AuthButton  w-100 mt-3">
                 Send OTP
-              </Button>
+              </CustomButton>
             </form>
           </div>
         </Col>

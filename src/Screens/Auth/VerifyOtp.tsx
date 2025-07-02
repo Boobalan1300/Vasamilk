@@ -20,6 +20,7 @@ import {
 
 import { Images } from "../../Utils/Images";
 import "../../Styles/Common.css";
+import CustomButton from "../../Components/Button";
 
 const { OTP } = Input;
 const { Title } = Typography;
@@ -173,9 +174,9 @@ const VerifyOtp: React.FC = () => {
                     {resendLoading ? "Resending..." : "Resend OTP"}
                   </span>
                 </div>
-                <Button className="mt-3 AuthButton" block htmlType="submit">
+                <CustomButton className="mt-3  w-100 AuthButton"  type="submit">
                   Verify OTP
-                </Button>
+                </CustomButton>
               </div>
             </form>
           </div>

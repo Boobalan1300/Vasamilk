@@ -12,6 +12,7 @@ import { getDecryptedCookie } from "../../Utils/Cookie";
 import { Images } from "../../Utils/Images";
 import "../../Styles/Common.css";
 import '../../Styles/FromFields.css'
+import CustomButton from "../../Components/Button";
 
 const { Title } = Typography;
 
@@ -135,9 +136,9 @@ const ResetPassword = () => {
                   Back
                 </span>
               </div>
-              <Button htmlType="submit" block className="AuthButton mt-3">
+              <CustomButton type="submit"  className="AuthButton  w-100 mt-3">
                 Reset Password
-              </Button>
+              </CustomButton>
             </form>
           </div>
         </Col>
