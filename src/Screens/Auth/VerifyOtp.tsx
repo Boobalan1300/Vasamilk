@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import Button from "../../Components/Button";
+
 import { Input, Row, Col, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";

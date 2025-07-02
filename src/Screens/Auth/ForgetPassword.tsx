@@ -5,7 +5,7 @@ import { Row, Col, Typography } from "antd";
 import { toast } from "react-toastify";
 
 import FormField from "../../Components/InputField";
-import Button from "../../Components/Button";
+
 import { handleForgetPasswordService } from "../../Service/ApiServices";
 import { Images } from "../../Utils/Images";
 import { setEncryptedCookie } from "../../Utils/Cookie";
