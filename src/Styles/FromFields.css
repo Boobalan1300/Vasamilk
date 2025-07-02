@@ -3,22 +3,18 @@
     margin-top:4px;
 }
 
+
+
+
 .btn-grey {
-  background-color: #1C2939 !important;
-  color: white !important;
+  background-color: var(--primary-color) !important;
+  color:var(--text-white)!important;
   border-radius: 20px !important;
   border: none !important;
   padding: 0;
   transition: all 0.3s ease;
 }
 
-
-.btn-grey.ant-btn:hover {
-  background-color: #1C2939 !important;
-  color: white !important;
-  border-color: white !important;
-  transform: scale(1.05);
-}
 
 
 .transparent-box {

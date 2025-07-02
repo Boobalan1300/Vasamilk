@@ -1,13 +1,15 @@
 
 
+
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CustomTable from "../../../Components/CustomTable";
 import CustomPagination from "../../../Components/CustomPagination";
 import { GetSlotMapping } from "../../../Service/ApiServices";
 import type { ColumnsType } from "antd/es/table";
 import { useToken } from "../../../Hooks/UserHook";
 import { toast } from "react-toastify";
+import CustomButton from "../../../Components/Button";
 
 interface SlotMappingRecord {
   slot_log_id: number;
@@ -30,14 +32,31 @@ interface SlotMappingRecord {
   is_assigned: string;
 }
 
-
 const SlotMappingList = () => {
   const [data, setData] = useState<SlotMappingRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const token = useToken();
+  const navigate = useNavigate();
   const location = useLocation();
+  
   const { slotId, givenType } = location.state || {};
+
+
+  const getTitle = () => {
+    let slotLabel = "";
+    let whoLabel = "";
+
+    if (slotId === 1) slotLabel = "Morning";
+    else if (slotId === 2) slotLabel = "Evening";
+    else slotLabel = "Unknown Slot";
+
+    if (givenType === 1) whoLabel = "Vendor";
+    else if (givenType === 2) whoLabel = "Distributor";
+    else whoLabel = "Unknown";
+
+    return `${slotLabel} - ${whoLabel} Slot Mappings`;
+  };
 
   useEffect(() => {
     if (token) fetchData(token, pagination.current, pagination.pageSize);
@@ -47,6 +66,11 @@ const SlotMappingList = () => {
     setLoading(true);
     const formData = new FormData();
     formData.append("token", token);
+
+    const today = new Date();
+    const fromDate = today.toISOString().split("T")[0]; 
+    formData.append("from_date", fromDate);
+
     if (slotId) formData.append("slot_id", slotId.toString());
     if (givenType) formData.append("mode", givenType.toString());
 
@@ -134,6 +158,17 @@ const SlotMappingList = () => {
 
   return (
     <>
+          <div className="d-flex justify-content-between align-items-center my-4">
+         <h4 className="">{getTitle()}</h4>
+        <CustomButton
+          className="btn-grey px-2 py-1"
+          onClick={() => navigate(-1)}
+        >
+          Back
+        </CustomButton>
+      </div>
+    
+
       <CustomTable
         columns={columns}
         data={data}
@@ -148,70 +183,6 @@ const SlotMappingList = () => {
           onChange={handlePageChange}
         />
       </div>
-
-      {/* <Modal
-        title="Slot Details"
-        open={viewModal}
-        onCancel={() => setViewModal(false)}
-        footer={null}
-        width={600}
-      > */}
-        {/* {viewData.length === 0 ? (
-          <p>No details found for this slot.</p>
-        ) : (
-          <List
-            itemLayout="vertical"
-            dataSource={viewData}
-            renderItem={(item) => (
-              <List.Item key={item.slot_log_id}>
-                <List.Item.Meta
-                  title={
-                    <strong>
-                      {item.slot_name} Slot — {item.customer_name}
-                    </strong>
-                  }
-                  description={`Scheduled Date: ${item.scheduled_date}`}
-                />
-                <ul style={{ paddingLeft: 20 }}>
-                  <li>
-                    <strong>Milk Given Status:</strong> {item.milk_given_status}
-                  </li>
-                  <li>
-                    <strong>Milk Given Type:</strong> {item.milk_given_type}
-                  </li>
-                  <li>
-                    <strong>Given Quantity:</strong> {item.milk_given_quantity}{" "}
-                    L
-                  </li>
-                  <li>
-                    <strong>Actual Quantity:</strong>{" "}
-                    {item.actual_milk_quantity} L
-                  </li>
-                  <li>
-                    <strong>Unit Price:</strong> ₹{item.unit_price}
-                  </li>
-                  <li>
-                    <strong>Assigned:</strong> {item.is_assigned}
-                  </li>
-                  <li>
-                    <strong>Assigned Distributor:</strong>{" "}
-                    {item.assigned_name || "N/A"}
-                  </li>
-                  <li>
-                    <strong>Payment Mode:</strong>{" "}
-                    {item.user_pay_mode === 1
-                      ? "Cash"
-                      : item.user_pay_mode === 2
-                      ? "Online"
-                      : "Other"}
-                  </li>
-                </ul>
-              </List.Item>
-            )}
-          />
-        )} */}
-
-      {/* </Modal> */}
     </>
   );
 };

@@ -21,7 +21,7 @@ const GlobalLoader = () => {
           zIndex: 9999,
         }}
       >
-        <Spin tip="Loading..." size="large" />
+        <Spin size="large" />
       </div>
     ) : null
   );

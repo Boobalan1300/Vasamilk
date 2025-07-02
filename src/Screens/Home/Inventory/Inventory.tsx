@@ -45,7 +45,7 @@ const Inventory = () => {
   };
 
   return (
-    <div className="container my-3">
+    <div className="container mb-2">
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={8}>
           <SimpleCard

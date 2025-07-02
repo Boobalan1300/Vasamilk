@@ -69,7 +69,7 @@ const DailyMilkReport = () => {
     <Col xs={24} md={12} lg={6}>
       <Card
         title={<Tag color={color}>{title}</Tag>}
-        bordered
+        
         hoverable
         extra={
           <CustomButton

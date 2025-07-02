@@ -8,6 +8,7 @@ import { useLoader } from "../../../Hooks/useLoader";
 import { useToken } from "../../../Hooks/UserHook";
 import { toast } from "react-toastify";
 import CustomButton from "../../../Components/Button";
+import { Tag } from "antd";
 
 interface AssignedSlotType {
   id: number;
@@ -26,8 +27,17 @@ const AssignedSlot = () => {
   const navigate = useNavigate();
   const { showLoader, hideLoader } = useLoader();
 
-  const lineId: number | undefined = location.state?.lineId;
-  const distributorId: number | undefined = location.state?.distributorId;
+  const {
+    lineId,
+    lineName,
+    distributorId,
+    distributorName,
+  }: {
+    lineId?: number;
+    lineName?: string;
+    distributorId?: number;
+    distributorName?: string;
+  } = location.state || {};
 
   const [assignedSlots, setAssignedSlots] = useState<AssignedSlotType[]>([]);
 
@@ -94,9 +104,17 @@ const AssignedSlot = () => {
   return (
     <div className="p-3">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">
-          Assigned Slots for Line ID: {lineId}, Distributor ID: {distributorId}
-        </h2>
+        <div>
+          <h5 className="mb-2">
+            Assigned Slots for Line:
+            <Tag color="#007bff" style={{ marginLeft: 8 }}>{lineName}</Tag>
+          </h5>
+          <h5 className="mb-1">
+            Distributor:
+            <span style={{ color: "#666f7a" }}> {distributorName} </span>
+          </h5>
+        </div>
+
         <CustomButton
           type="button"
           className="btn-grey px-2 py-1"

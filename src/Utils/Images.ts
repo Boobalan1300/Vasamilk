@@ -2,8 +2,7 @@
 import dashboard from "../assets/Icons/Png/dashboard.png"
 import user from "../assets/Icons/Png/user.png"
 import inventory from "../assets/Icons/Png/inventory.png"
-import logout from "../assets/Icons/Png/logout.png"
-import logout1 from "../assets/Icons/Png/logout1.png"
+import logout from "../assets/Images/Png/logout.png"
 import edit from "../assets/Icons/Png/edit.png"
 import trash from "../assets/Icons/Png/trash.png"
 import add from "../assets/Icons/Png/add.png"
@@ -27,7 +26,7 @@ export const Images = {
     inventory,
     distributor,
     logout,
-    logout1,
+   
     milkBottle,
     morning,
     evening,

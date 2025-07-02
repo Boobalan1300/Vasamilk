@@ -15,6 +15,7 @@ import FormField from "../../../Components/InputField";
 import { useNavigate } from "react-router-dom";
 import { useToken } from "../../../Hooks/UserHook";
 import CustomDropDown from "../../../Components/CustomDropDown";
+import CustomButton from "../../../Components/Button";
 
 const { Option } = Select;
 
@@ -252,8 +253,8 @@ useEffect(() => {
         alternative_number: data.alternative_number || "",
         user_type: String(data.user_type || ""),
         customer_type: String(data.customer_type || ""),
-        line_id: String(data.line_id || ""),
-        price_tag_id: String(data.price_tag_id || ""),
+        line_id: String(data.line_name || ""),
+        price_tag_id: String(data.price_tag_name || ""),
         pay_type: data.pay_type != null ? String(data.pay_type) : "",
         slot_data: data.slot_data || [
           { slot_id: 1, quantity: "", method: "", start_date: "" },
@@ -272,6 +273,7 @@ useEffect(() => {
 
   const renderSlotField = (index: number, label: string) => (
     <>
+    
       <h5>{label}</h5>
 
       <div className="row">
@@ -331,8 +333,22 @@ useEffect(() => {
     <div className="container mt-4">
       {error && <div className="alert alert-danger">{error}</div>}
 
+
+      <div className="d-flex justify-content-between align-items-center mb-3">
+  <h2>{isEdit ? "EDIT USER":"ADD USER" }</h2>
+
+        <CustomButton
+          type="button"
+          className="btn-grey px-2 py-1"
+          onClick={() => navigate(-1)}
+        >
+          Back
+        </CustomButton>
+      </div>
+
+
       <div className="d-flex justify-content-between mb-3">
-        <h2>{isEdit ? "EDIT USER":"ADD USER" }</h2>
+      
       </div>
 
       <form onSubmit={handleSubmit}>

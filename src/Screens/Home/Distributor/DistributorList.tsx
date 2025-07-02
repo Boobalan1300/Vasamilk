@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Tag } from "antd";
 import { GetDistributorLines } from "../../../Service/ApiServices";
@@ -70,7 +69,9 @@ const DistributorLinesTable = () => {
                       navigate("/assignedSlots", {
                         state: {
                           lineId: line.id,
+                          lineName: line.line_name,
                           distributorId: dist.distributer_id,
+                          distributorName: dist.distributer_name,
                         },
                       })
                     }

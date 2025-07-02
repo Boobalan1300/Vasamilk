@@ -18,7 +18,7 @@ const SimpleCard: React.FC<SimpleCardProps> = ({
 }) => {
   return (
     <Card
-      bordered={false}
+    
       className="rounded-3 "
       style={{
         backgroundColor:backgroundColor,
