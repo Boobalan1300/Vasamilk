@@ -1,12 +1,11 @@
-
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Layout, Menu, message } from "antd";
-import { useUser } from "../Context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { Images } from "../Utils/Images";
 import "../Styles/Common.css";
-import { clearCookie, getUser } from "../Utils/Cookie";
+import { clearCookie } from "../Utils/Cookie";
 import { handleLogout } from "../Service/ApiServices";
+import { useUserType, useToken } from "../Hooks/UserHook";
 
 const { Sider } = Layout;
 
@@ -15,25 +14,18 @@ type SideBarProps = {
 };
 
 const SideBar: React.FC<SideBarProps> = ({ collapsed }) => {
-  const { user } = useUser();
-  const [userType, setUserType] = useState<number | null>(0);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      setUserType(user?.user_type ?? 0);
-    }
-  }, [user]);
+  const userType = useUserType();
+  const token = useToken();
 
   const logoutUser = () => {
-    const user = getUser();
-    if (!user?.token) {
+    if (!token) {
       navigate("/login");
       return;
     }
 
     const formData = new FormData();
-    formData.append("token", user.token);
+    formData.append("token", token);
 
     handleLogout(formData)
       .then(() => {
@@ -47,21 +39,10 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed }) => {
   };
 
   const menuItems = [
-   
     ...(userType === 0 || userType === 1
       ? [
           {
             key: "1",
-            icon: (
-              <span className="iconWrapper">
-                <img src={Images.user} alt="users" className="iconStyle" />
-              </span>
-            ),
-            label: "Users",
-            onClick: () => navigate("/userManagement"),
-          },
-          {
-            key: "2",
             icon: (
               <span className="iconWrapper">
                 <img
@@ -75,18 +56,28 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed }) => {
             onClick: () => navigate("/inventory"),
           },
           {
-            key: "3",
+            key: "2",
             icon: (
               <span className="iconWrapper">
                 <img
-                  src={Images.inventory}
+                  src={Images.distributor}
                   alt="Distributor"
                   className="iconStyle"
                 />
               </span>
             ),
             label: "Distributor",
-            onClick: () => navigate("/distributorLog"),
+            onClick: () => navigate("/distributorList"),
+          },
+          {
+            key: "3",
+            icon: (
+              <span className="iconWrapper">
+                <img src={Images.user} alt="users" className="iconStyle" />
+              </span>
+            ),
+            label: "Users",
+            onClick: () => navigate("/userManagement"),
           },
         ]
       : []),

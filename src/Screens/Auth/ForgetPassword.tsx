@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Row, Col, Typography } from "antd";
 import { toast } from "react-toastify";
 
-import FormField from "../../Components/FormField";
+import FormField from "../../Components/InputField";
 import Button from "../../Components/Button";
 import { handleForgetPasswordService } from "../../Service/ApiServices";
 import { Images } from "../../Utils/Images";

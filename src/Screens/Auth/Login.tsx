@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import { handleLogin } from "../../Service/ApiServices";
 import { Images } from "../../Utils/Images";
-import FormField from "../../Components/FormField";
+import FormField from "../../Components/InputField";
 import Button from "../../Components/Button";
 import { SALT_KEY } from "../../../public/config";
 
@@ -15,7 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "../../Styles/Common.css";
 import { useEffect } from "react";
 import { setEncryptedCookie } from "../../Utils/Cookie";
-import '../../Styles/FromFields.css'
+import "../../Styles/FromFields.css";
 
 const { Title } = Typography;
 
@@ -63,7 +63,7 @@ const Login = () => {
 
           setEncryptedCookie("user_data", authData, 120);
 
-          navigate("/userManagement");
+          navigate("/inventory");
         } else {
           toast.error(data.msg || "Login failed.");
         }
@@ -91,20 +91,18 @@ const Login = () => {
         backgroundPosition: "center",
       }}
     >
-<Row className="w-100 p-4 transparent-box" style={{ maxWidth: "900px" }}>
+      <Row className="w-100 p-4 transparent-box" style={{ maxWidth: "900px" }}>
         <Col
           xs={24}
           md={12}
           className="d-flex justify-content-center align-items-center p-4 text-center bg-light mt-4 mt-md-0"
         >
           <div>
-              <img src={Images.logo} className="w-50 h-50"/>
-               <p className="mb-0 fs-5 fw-medium">
-            
-            Join us to get seamless delivery with us
-          </p>
+            <img src={Images.logo} className="w-50 h-50" />
+            <p className="mb-0 fs-5 fw-medium">
+              Join us to get seamless delivery with us
+            </p>
           </div>
-         
         </Col>
 
         <Col xs={24} md={12}>

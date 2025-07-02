@@ -1,7 +1,3 @@
-
-
-
-
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -9,27 +5,19 @@ import { Select } from "antd";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { getDecryptedCookie, getUser } from "../../../Utils/Cookie";
+
 import {
-  fetchLinesDropDown,
-  fetchPriceTagDropDown,
   fetchUserById,
   handleCreateUser,
   handleEditUser,
 } from "../../../Service/ApiServices";
-import FormField from "../../../Components/FormField";
+import FormField from "../../../Components/InputField";
 import { useNavigate } from "react-router-dom";
+import { useToken } from "../../../Hooks/UserHook";
+import CustomDropDown from "../../../Components/CustomDropDown";
 
 const { Option } = Select;
 
-interface Line {
-  id: string;
-  line_name: string;
-}
-interface PriceTag {
-  id: string;
-  price_tag_name: string;
-}
 interface SlotEntry {
   id?: number;
   slot_id: number;
@@ -91,25 +79,21 @@ const getValidationSchema = (isEdit: boolean) =>
           .of(
             Yup.object().shape({
               slot_id: Yup.number().required("Slot ID required"),
-              quantity: Yup.string().when("$index", {
-                is: 0, 
-                then: (schema) => schema.required("Quantity required"),
-                otherwise: (schema) => schema.notRequired(),
-              }),
-              method: Yup.string().when("$index", {
-                is: 0,
-                then: (schema) => schema.required("Method required"),
-                otherwise: (schema) => schema.notRequired(),
-              }),
-              start_date: Yup.string().when(["$index", "quantity", "method"], {
-                is: (index: number, quantity: string, method: string) =>
-                  index === 0 || quantity || method,
-                then: (schema) => schema.required("Start date required"),
-                otherwise: (schema) => schema.notRequired(),
-              }),
+              quantity: Yup.string().notRequired(),
+              method: Yup.string().notRequired(),
+              start_date: Yup.string().notRequired(),
             })
           )
-          .min(1, "At least one slot is required"),
+          .test(
+            "at-least-one-slot",
+            "At least one slot with quantity and method is required",
+            (slots) =>
+              Array.isArray(slots) &&
+              slots.some(
+                (slot) =>
+                  !!slot.quantity?.trim() && !!slot.method?.toString().trim()
+              )
+          ),
       otherwise: () => Yup.mixed().notRequired(),
     }),
   });
@@ -120,36 +104,9 @@ const CreateUser = () => {
   const id = location.state?.id;
   const isEdit = !!id;
 
-  console.log(id);
-  const [user, setUser] = useState<{ token: string } | null>(null);
-  const [linesList, setLinesList] = useState<Line[]>([]);
-  const [priceTagList, setPriceTagList] = useState<PriceTag[]>([]);
   const [error, setError] = useState<string | null>(null);
 
- 
-  useEffect(() => {
-    const parsedUser = getUser();
-    if (parsedUser) setUser(parsedUser);
-    else setError("Invalid user data");
-  }, []);
-
-
-  useEffect(() => {
-    if (user?.token) {
-      const formData = new FormData();
-      formData.append("token", user.token);
-      formData.append("type", "1"); 
-      formData.append("distributer_id", "123"); 
-
-      fetchLinesDropDown(formData)
-        .then((res) => setLinesList(res.data.data))
-        .catch(() => setError("Failed to fetch lines"));
-
-      fetchPriceTagDropDown(formData)
-        .then((res) => setPriceTagList(res.data.data))
-        .catch(() => setError("Failed to fetch price tags"));
-    }
-  }, [user]);
+  const token = useToken();
 
   const {
     values,
@@ -159,6 +116,7 @@ const CreateUser = () => {
     handleBlur,
     handleSubmit,
     resetForm,
+
     setFieldValue,
     setValues,
   } = useFormik<FormValues>({
@@ -180,88 +138,86 @@ const CreateUser = () => {
       ],
     },
     validationSchema: getValidationSchema(isEdit),
-    onSubmit: async (values) => {
-      await submitUserForm(values);
+    onSubmit: (values) => {
+      submitUserForm(values);
     },
-    validateOnBlur: false,
-    validateOnChange: false,
+    validateOnChange: true,
+    validateOnBlur: true,
   });
 
   const submitUserForm = async (values: FormValues) => {
     try {
-      const decrypted = getDecryptedCookie("user_data") || "";
-      const { token } = JSON.parse(decrypted);
+      const token = useToken();
+
+      const isCustomer = values.user_type === "5";
+      const isRegularCustomer = isCustomer && values.customer_type === "1";
+
+      const morningSlot = values.slot_data?.[0] || {};
+      const eveningSlot = values.slot_data?.[1] || {};
+
+      const slotData = isRegularCustomer
+        ? [
+            ...(morningSlot.quantity &&
+            morningSlot.method &&
+            morningSlot.start_date
+              ? [
+                  {
+                    id: morningSlot.id,
+                    slot_id: morningSlot.slot_id,
+                    quantity: parseFloat(morningSlot.quantity),
+                    method: parseInt(morningSlot.method, 10),
+                    start_date: morningSlot.start_date,
+                  },
+                ]
+              : []),
+            ...(eveningSlot.quantity && eveningSlot.method
+              ? [
+                  {
+                    id: eveningSlot.id,
+                    slot_id: eveningSlot.slot_id,
+                    quantity: parseFloat(eveningSlot.quantity),
+                    method: parseInt(eveningSlot.method, 10),
+                    start_date: morningSlot.start_date,
+                  },
+                ]
+              : []),
+          ]
+        : [];
 
       const payload: any = {
         token,
-        name: values.name,
-        user_name: values.user_name,
-        email: values.email,
-        phone: values.phone,
-        alternative_number: values.alternative_number,
-        user_type: parseInt(values.user_type),
+
+        ...(values.name && { name: values.name }),
+        ...(values.user_name && { user_name: values.user_name }),
+        ...(values.email && { email: values.email }),
+        ...(values.phone && { phone: values.phone }),
+        ...(values.alternative_number && {
+          alternative_number: values.alternative_number,
+        }),
+        ...(values.user_type && { user_type: parseInt(values.user_type) }),
+
+        ...(isEdit && id
+          ? { id: parseInt(id) }
+          : { password: values.password }),
+
+        ...(isCustomer && {
+          customer_type: parseInt(values.customer_type),
+          line_id: parseInt(values.line_id),
+          price_tag_id: parseInt(values.price_tag_id),
+          pay_type: parseInt(values.pay_type),
+          ...(isRegularCustomer && { slot_data: slotData }),
+        }),
       };
 
-      if (isEdit && id) {
-        payload.id = parseInt(id);
-      } else {
-        payload.password = values.password;
-      }
-
-      if (values.user_type === "5") {
-        payload.customer_type = parseInt(values.customer_type);
-        payload.line_id = parseInt(values.line_id);
-        payload.price_tag_id = parseInt(values.price_tag_id);
-        payload.pay_type = parseInt(values.pay_type);
-
-        if (values.customer_type === "1") {
-          const morningSlot = values.slot_data[0];
-          const eveningSlot = values.slot_data[1];
-
-          const slotData = [];
-
-          if (
-            morningSlot.quantity &&
-            morningSlot.method &&
-            morningSlot.start_date
-          ) {
-            console.log("id",morningSlot.id)
-            slotData.push({
-              id: morningSlot.id,
-              slot_id: morningSlot.slot_id,
-              quantity: parseFloat(morningSlot.quantity),
-              method: parseInt(morningSlot.method, 10),
-              start_date: morningSlot.start_date,
-            });
-          }
-
-          if (eveningSlot.quantity && eveningSlot.method) {
-            slotData.push({
-              id: eveningSlot.id,
-              slot_id: eveningSlot.slot_id,
-              quantity: parseFloat(eveningSlot.quantity),
-              method: parseInt(eveningSlot.method, 10),
-              start_date: morningSlot.start_date,
-            });
-          }
-
-          payload.slot_data = slotData;
-        }
-      }
-
-      console.log(payload)
+      console.log("payload", payload);
 
       const request = isEdit ? handleEditUser : handleCreateUser;
       const response = await request(payload);
 
       if (response?.data?.status === 1) {
         toast.success(response.data.msg);
-         navigate("/userManagement");
-        
-        resetForm();
-      }   if (response?.data?.status === 1) {
-        toast.success(response.data.msg);
-        
+        navigate("/userManagement");
+
         resetForm();
       } else {
         toast.error(response.data.msg || "Something went wrong");
@@ -271,39 +227,43 @@ const CreateUser = () => {
     }
   };
 
- 
-  useEffect(() => {
-    if (id && user?.token) {
-      const formData = new FormData();
-      formData.append("token", user.token);
-      formData.append("user_id", id);
+useEffect(() => {
+  if (id && token) {
+    loadUserDetails(id, token);
+  }
+}, [id, token]);
 
-      fetchUserById(formData)
-        .then((res) => {
-          const data = res.data.data;
-        
-          setValues({
-            name: data.name || "",
-            user_name: data.user_name || "",
-            email: data.email || "",
-            phone: data.phone || "",
-            alternative_number: data.alternative_number || "",
-            user_type: String(data.user_type || ""),
-            customer_type: String(data.customer_type || ""),
-            line_id: String(data.line_id || ""),
-            price_tag_id: String(data.price_tag_id || ""),
-            pay_type: data.pay_type != null ? String(data.pay_type) : "",
-            slot_data: data.slot_data || [
-              { slot_id: 1, quantity: "", method: "", start_date: "" },
-              { slot_id: 2, quantity: "", method: "", start_date: "" },
-            ],
-            password: "",
-          });
-        })
-        .catch(() => setError("Failed to fetch user details"));
-    }
-  }, [id, user?.token]);
 
+  const loadUserDetails = (id: string, token: string) => {
+  const formData = new FormData();
+  formData.append("token", token);
+  formData.append("user_id", id);
+
+  fetchUserById(formData)
+    .then((res) => {
+      const data = res.data.data;
+      console.log(data)
+
+      setValues({
+        name: data.name || "",
+        user_name: data.user_name || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        alternative_number: data.alternative_number || "",
+        user_type: String(data.user_type || ""),
+        customer_type: String(data.customer_type || ""),
+        line_id: String(data.line_id || ""),
+        price_tag_id: String(data.price_tag_id || ""),
+        pay_type: data.pay_type != null ? String(data.pay_type) : "",
+        slot_data: data.slot_data || [
+          { slot_id: 1, quantity: "", method: "", start_date: "" },
+          { slot_id: 2, quantity: "", method: "", start_date: "" },
+        ],
+        password: "",
+      });
+    })
+    .catch(() => setError("Failed to fetch user details"));
+};
 
   const methodOptions = [
     { label: "Direct", value: 1 },
@@ -313,6 +273,7 @@ const CreateUser = () => {
   const renderSlotField = (index: number, label: string) => (
     <>
       <h5>{label}</h5>
+
       <div className="row">
         <div className="col-md-4 mb-3">
           <FormField
@@ -330,6 +291,7 @@ const CreateUser = () => {
         <div className="col-md-4 mb-3">
           <label>Method</label>
           <Select
+            allowClear
             value={values.slot_data[index]?.method || undefined}
             onChange={(val) => setFieldValue(`slot_data[${index}].method`, val)}
             placeholder="Select method"
@@ -341,12 +303,6 @@ const CreateUser = () => {
               </Option>
             ))}
           </Select>
-          {(touched.slot_data?.[index] as any)?.method &&
-            (errors.slot_data?.[index] as any)?.method && (
-              <div className="text-danger">
-                {(errors.slot_data?.[index] as any)?.method}
-              </div>
-            )}
         </div>
         {index === 0 && (
           <div className="col-md-4 mb-3">
@@ -358,7 +314,7 @@ const CreateUser = () => {
               value={values.slot_data[index]?.start_date || ""}
               onChange={(e) => {
                 handleChange(e);
-            
+
                 setFieldValue(`slot_data[1].start_date`, e.target.value);
               }}
               onBlur={handleBlur}
@@ -376,7 +332,7 @@ const CreateUser = () => {
       {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="d-flex justify-content-between mb-3">
-        <h2>Add User</h2>
+        <h2>{isEdit ? "EDIT USER":"ADD USER" }</h2>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -407,7 +363,6 @@ const CreateUser = () => {
           </div>
         </div>
 
-       
         <div className="row">
           <div className="col-md-6 mb-3">
             <FormField
@@ -435,7 +390,6 @@ const CreateUser = () => {
           </div>
         </div>
 
-      
         <div className="row">
           <div className="col-md-6 mb-3">
             <FormField
@@ -466,104 +420,56 @@ const CreateUser = () => {
           )}
         </div>
 
-        
         <div className="row">
           <div className="col-md-6 mb-3">
             <label>User Type</label>
             <Select
+              allowClear
               className="w-100"
               placeholder="Select user type"
-              value={values.user_type}
-              onChange={(val) => setFieldValue("user_type", val)}
+              value={values.user_type || undefined}
+              onChange={(val) => {
+                setFieldValue("user_type", val ?? "");
+              }}
             >
               <Option value="2">Admin</Option>
               <Option value="3">Vendor</Option>
               <Option value="4">Distributor</Option>
               <Option value="5">Customer</Option>
             </Select>
-            {errors.user_type && (
+            {errors.user_type && touched.user_type && (
               <div className="text-danger">{errors.user_type}</div>
             )}
           </div>
         </div>
 
-     
         {values.user_type === "5" && (
           <>
             <div className="row">
-              <div className="col-md-4 mb-3">
-                <label>Customer Type</label>
-                <Select
-                  className="w-100"
-                  value={values.customer_type}
-                  onChange={(val) => setFieldValue("customer_type", val)}
-                  placeholder="Select customer type"
-                >
-                  <Option value="1">Regular</Option>
-                  <Option value="2">Occasional</Option>
-                </Select>
-                {errors.customer_type && (
-                  <div className="text-danger">{errors.customer_type}</div>
-                )}
-              </div>
-              <div className="col-md-4 mb-3">
-                <label>Line</label>
-                <Select
-                  className="w-100"
-                  value={values.line_id}
-                  onChange={(val) => setFieldValue("line_id", val)}
-                  placeholder="Select line"
-                >
-                  {linesList.map((line) => (
-                    <Option key={line.id} value={line.id}>
-                      {line.line_name}
-                    </Option>
-                  ))}
-                </Select>
-                {errors.line_id && (
-                  <div className="text-danger">{errors.line_id}</div>
-                )}
-              </div>
-              <div className="col-md-4 mb-3">
-                <label>Price Tag</label>
-                <Select
-                  className="w-100"
-                  value={values.price_tag_id}
-                  onChange={(val) => setFieldValue("price_tag_id", val)}
-                  placeholder="Select price tag"
-                >
-                  {priceTagList.map((tag) => (
-                    <Option key={tag.id} value={tag.id}>
-                      {tag.price_tag_name}
-                    </Option>
-                  ))}
-                </Select>
-                {errors.price_tag_id && (
-                  <div className="text-danger">{errors.price_tag_id}</div>
-                )}
-              </div>
-              <div className="col-md-4 mb-3">
-                <label>Pay Type</label>
-                <Select
-                  className="w-100"
-                  value={values.pay_type}
-                  onChange={(val) => setFieldValue("pay_type", val)}
-                  placeholder="Select pay type"
-                >
-                  <Option value="1">Prepaid</Option>
-                  <Option value="2">Postpaid</Option>
-                </Select>
-                {errors.pay_type && (
-                  <div className="text-danger">{errors.pay_type}</div>
-                )}
-              </div>
+              <CustomDropDown
+                dropdownKeys={[
+                  "customer_type",
+                  "line_id",
+                  "price_tag_id",
+                  "pay_type",
+                ]}
+                formik={{
+                  values,
+                  setFieldValue,
+                  handleBlur,
+                  touched,
+                  errors,
+                }}
+              />
             </div>
 
-           
             {values.customer_type === "1" && (
               <>
                 {renderSlotField(0, "Morning Slot")}
                 {renderSlotField(1, "Evening Slot")}
+                {errors.slot_data && typeof errors.slot_data === "string" && (
+                  <div className="text-danger mb-3">{errors.slot_data}</div>
+                )}
               </>
             )}
           </>

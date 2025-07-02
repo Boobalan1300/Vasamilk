@@ -1,41 +1,49 @@
 import { useEffect, useState } from "react";
-import { Table, Tag, Spin, Button } from "antd";
+import { Tag } from "antd";
 import { GetInventoryLog } from "../../../Service/ApiServices";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { getUser } from "../../../Utils/Cookie";
+
+import CustomTable from "../../../Components/CustomTable";
+import { useLoader } from "../../../Hooks/useLoader";
+import { useToken } from "../../../Hooks/UserHook";
+import CustomButton from "../../../Components/Button";
 
 const ListLog = () => {
   const [logData, setLogData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-const location = useLocation();
-const inventoryId = location.state?.inventoryId;
-const [searchParams] = useSearchParams();
-const page = searchParams.get("page") || "1";
+  const location = useLocation();
+  const inventoryId = location.state?.inventoryId;
+  const [searchParams] = useSearchParams();
+  const page = searchParams.get("page") || "1";
+  const navigate = useNavigate();
+  const { showLoader, hideLoader } = useLoader();
+  const token = useToken();
 
- const navigate = useNavigate();
+  useEffect(() => {
+    if (token && inventoryId) {
+      fetchInventoryLog(token);
+    }
+  }, [token, inventoryId]);
 
-useEffect(() => {
-  const user = getUser();
-  if (!user?.token || !inventoryId) return;
-
-  setLoading(true);
-  GetInventoryLog({
-    token: user.token,
-    inventory_id: Number(inventoryId),
-    page: 1,
-    size: 100,
-  })
-    .then((res) => {
-      if (res.data.status === 1) {
-        setLogData(res.data.data);
-      }
+  const fetchInventoryLog = (token: string) => {
+    showLoader();
+    GetInventoryLog({
+      token,
+      inventory_id: Number(inventoryId),
+      page: 1,
+      size: 100,
     })
-    .catch(() => {
-      setLogData([]);
-    })
-    .finally(() => setLoading(false));
-}, [inventoryId]);
-
+      .then((res) => {
+        if (res.data.status === 1) {
+          setLogData(res.data.data);
+        } else {
+          setLogData([]);
+        }
+      })
+      .catch(() => {
+        setLogData([]);
+      })
+      .finally(() => hideLoader());
+  };
 
   const columns = [
     {
@@ -43,7 +51,16 @@ useEffect(() => {
       dataIndex: "type",
       key: "type",
       render: (value: string) =>
-        value === "In" ? <Tag color="green">In</Tag> : <Tag color="red">Out</Tag>,
+        value === "In" ? (
+          <Tag color="green">In</Tag>
+        ) : (
+          <Tag color="red">Out</Tag>
+        ),
+    },
+    {
+      title: "Previous",
+      dataIndex: "pervious_quantity",
+      key: "pervious_quantity",
     },
     {
       title: "Quantity",
@@ -56,11 +73,6 @@ useEffect(() => {
       key: "remaining_quantity",
     },
     {
-      title: "Previous",
-      dataIndex: "pervious_quantity",
-      key: "pervious_quantity",
-    },
-    {
       title: "Given By",
       dataIndex: "given_by_name",
       key: "given_by_name",
@@ -70,7 +82,8 @@ useEffect(() => {
       dataIndex: "slot_name",
       key: "slot_name",
       render: (slot: string) => {
-        const color = slot === "Morning" ? "blue" : slot === "Evening" ? "gold" : "default";
+        const color =
+          slot === "Morning" ? "blue" : slot === "Evening" ? "gold" : "default";
         return <Tag color={color}>{slot || "-"}</Tag>;
       },
     },
@@ -85,21 +98,17 @@ useEffect(() => {
     <div className="p-3">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Inventory Log</h2>
-       <Button type="primary" onClick={() => navigate(`/inventory?page=${page}`)}>
-  Back
-</Button>
-
+        <CustomButton
+          className="btn-grey px-2 py-1"
+          onClick={() => navigate(`/inventory?page=${page}`)}
+        >
+          Back
+        </CustomButton>
       </div>
 
-      {loading ? (
-        <div className="text-center py-5">
-          <Spin size="large" />
-        </div>
-      ) : (
-        <div className="table-responsive">
-          <Table columns={columns} dataSource={logData} rowKey="id" pagination={false} />
-        </div>
-      )}
+      <div className="table-responsive">
+        <CustomTable columns={columns} data={logData} rowKey="id" />
+      </div>
     </div>
   );
 };

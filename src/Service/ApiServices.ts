@@ -138,7 +138,7 @@ export const GetDistributorLines =(formData:FormData)=>{
 }
 
 
-
+//not used
 export const GetDistributorInventoryLog = (
   formData: FormData,
   page: number = 1,
@@ -149,9 +149,6 @@ export const GetDistributorInventoryLog = (
     formData
   );
 };
-
-
-
 
 
 
@@ -178,8 +175,26 @@ export const GetDistributorWithLines = (formData: FormData) => {
 
 
 
-export const AssignDistributorSlotMap = (formData: FormData) => {
-  return axios.post(`/milk-api/slot-assign/assign-slot-map`, formData);
+export const AssignDistributorSlotMap = (payload:object) => {
+  return axios.post(`/milk-api/slot-assign/assign-slot-map`, payload);
 };
 
 
+
+
+
+export const GetCustomers = (formData: FormData) => {
+  return axios.post(`/milk-api/drop-down/customer-drop-down`, formData);
+};
+
+
+export const ListAssignedSlot = (
+  page: number = 1,
+  size: number = 10,
+  payload: any
+) => {
+  return axios.post(
+    `/milk-api/slot-assign/list-assigned-slot?page=${page}&size=${size}`,
+    payload
+  );
+};

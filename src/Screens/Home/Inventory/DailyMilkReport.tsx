@@ -1,29 +1,25 @@
-
-
-
 import { useEffect, useState } from "react";
-import { Card, Tag, Spin, message, Row, Col, Button } from "antd";
+import { Card, Tag, Spin, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
-import { getUser } from "../../../Utils/Cookie";
 import { GetMilkDailyReport } from "../../../Service/ApiServices";
-import AddDistributorLogModal from "../../../Modal/AddDistributorLog";
+import { useToken } from "../../../Hooks/UserHook";
+import { toast } from "react-toastify";
+import CustomButton from "../../../Components/Button";
 
 const DailyMilkReport = () => {
   const [inData, setInData] = useState<{ [slotId: number]: number }>({});
   const [outData, setOutData] = useState<{ [slotId: number]: number }>({});
   const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [hasActiveSlot, setHasActiveSlot] = useState(false);
   const navigate = useNavigate();
+  const token = useToken();
 
   useEffect(() => {
     fetchReport();
   }, []);
 
   const fetchReport = () => {
-    const token = getUser()?.token;
     if (!token) {
-      message.error("Authentication token missing");
+      toast.error("Authentication token missing");
       return;
     }
 
@@ -36,11 +32,9 @@ const DailyMilkReport = () => {
         if (res.data.status === 1) {
           const inResult: { [slotId: number]: number } = {};
           const outResult: { [slotId: number]: number } = {};
-          let active = false;
 
           res.data.data.forEach((item: any) => {
             const qty = parseFloat(item.total_quantity);
-            const available = parseFloat(item.available_quantity || "0");
             const slotId = item.slot_id;
             const type = item.given_type;
 
@@ -49,64 +43,48 @@ const DailyMilkReport = () => {
             } else if (type === 2) {
               outResult[slotId] = (outResult[slotId] || 0) + qty;
             }
-
-            if (available > 0) {
-              active = true;
-            }
           });
 
           setInData(inResult);
           setOutData(outResult);
-          setHasActiveSlot(active);
         } else {
-          message.error(res.data.msg || "Failed to load report");
+          toast.error(res.data.msg || "Failed to load report");
         }
       })
-      .catch((err) => {
-        console.error("Error fetching daily milk report:", err);
-        message.error("Something went wrong while fetching the report");
+      .catch(() => {
+        toast.error("Something went wrong while fetching the report");
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  const getSlotLabel = (slotId: number) => {
-    if (slotId === 1) return "Morning";
-    if (slotId === 2) return "Evening";
-    return `Slot ${slotId}`;
-  };
-
   const renderCard = (
     title: string,
     color: string,
-    data: { [slotId: number]: number },
-    showLogButton: boolean = false
+    quantity: number,
+    slotId: number,
+    givenType: number
   ) => (
-    <Col xs={24} md={12}>
+    <Col xs={24} md={12} lg={6}>
       <Card
-        title={
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Tag color={color}>{title}</Tag>
-            {showLogButton && (
-              // <Button type="primary" size="small" onClick={() => navigate("/distributorLog")}>
-              //   Go to Distribution Log
-              // </Button>
-
-              <Button type="primary" size="small" onClick={() => navigate("/listslotMap")}>
-                list slot Mapping
-              </Button>
-            )}
-          </div>
-        }
+        title={<Tag color={color}>{title}</Tag>}
         bordered
         hoverable
+        extra={
+          <CustomButton
+            className="btn-grey px-2 py-1"
+            onClick={() =>
+              navigate("/listslotMap", { state: { slotId, givenType } })
+            }
+          >
+            View Slots
+          </CustomButton>
+        }
       >
-        {Object.entries(data).map(([slotId, quantity]) => (
-          <p key={slotId}>
-            <strong>{getSlotLabel(Number(slotId))}:</strong> {quantity} L
-          </p>
-        ))}
+        <p>
+          <strong>Quantity:</strong> {quantity ?? 0} L
+        </p>
       </Card>
     </Col>
   );
@@ -115,30 +93,16 @@ const DailyMilkReport = () => {
     <div className="p-3">
       <h2 className="mb-4">Daily Milk Required Report</h2>
 
-      <div style={{ marginBottom: 16 }}>
-        <Button
-          type="primary"
-          onClick={() => setIsModalOpen(true)}
-          disabled={!hasActiveSlot}
-        >
-          Add Log
-        </Button>
-      </div>
-
       {loading ? (
         <Spin size="large" />
       ) : (
         <Row gutter={[16, 16]}>
-          {renderCard("In (Received)", "green", inData)}
-          {renderCard("Out (Distributed)", "red", outData, true)}
+          {renderCard("Morning - Vendor", "green", inData[1] || 0, 1, 1)}
+          {renderCard("Evening - Vendor", "blue", inData[2] || 0, 2, 1)}
+          {renderCard("Morning - Distributor", "red", outData[1] || 0, 1, 2)}
+          {renderCard("Evening - Distributor", "purple", outData[2] || 0, 2, 2)}
         </Row>
       )}
-
-      <AddDistributorLogModal
-        visible={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={fetchReport}
-      />
     </div>
   );
 };

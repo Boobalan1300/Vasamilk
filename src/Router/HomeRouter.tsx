@@ -1,14 +1,17 @@
 
-import CreateUser from "../Screens/Home/Admin/CreateUser";
-import UserList from "../Screens/Home/Admin/UserList";
+import CreateUser from "../Screens/Home/User/CreateUser";
+import UserList from "../Screens/Home/User/UserList";
 import Inventory from "../Screens/Home/Inventory/Inventory";
 // import DistributorDashboard from "../Screens/Distributor/DistributorDashboard";
 // import VendorDashboard from "../Screens/Vendor/VendorDashboard";
 import MainLayout from "../Layout/MainLayout";
 import { PrivateRoute } from "./PrivateRouter";
 import ListLog from "../Screens/Home/Inventory/InventoryLog";
-import DistributorLog from "../Screens/Home/Inventory/DistributorLog";
+
 import SlotMappingList from "../Screens/Home/Inventory/SlotMappingList";
+import DistributorList from "../Screens/Home/Distributor/DistributorList";
+import AssignedSlot from "../Screens/Home/Distributor/AssignedSlot";
+import AssignDistributor from "../Screens/Home/Distributor/AssignDistributor";
 
 export const HomeRouter = [
   {
@@ -21,13 +24,14 @@ export const HomeRouter = [
           { path: "/createUser", element: <CreateUser /> },
           { path: "/editUser", element: <CreateUser /> },
           { path: "/inventory", element: <Inventory /> },
+           {path:"/listslotMap",element:<SlotMappingList/>},
           {path: "/listLog", element: <ListLog /> },
-          //slot mapping
-          {path:"/listslotMap",element:<SlotMappingList/>},
+            
+          {path:"/distributorList",element:<DistributorList/>},
+           {path:"assignedSlots",element:<AssignedSlot/>},
 
-          
-
-          { path: "/distributorLog", element: <DistributorLog /> },
+           {path:"assignDistributor",element:<AssignDistributor/>},
+         
         ],
       },
 

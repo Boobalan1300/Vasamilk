@@ -1,12 +1,14 @@
+
 import { useEffect, useState } from "react";
 import { Row, Col } from "antd";
 import { GetDailyInventoryReport } from "../../../Service/ApiServices";
-import { getUser } from "../../../Utils/Cookie";
+
 import SimpleCard from "../../../Components/SimpleCard";
 import { Images } from "../../../Utils/Images";
 import InventoryChart from "../Charts/InventoryChart";
 import InventoryList from "./InventoryList";
 import DailyMilkReport from "./DailyMilkReport";
+import { useToken } from "../../../Hooks/UserHook";
 
 interface InventoryData {
   eve_slot_count: number;
@@ -17,22 +19,20 @@ interface InventoryData {
 }
 
 const Inventory = () => {
-  const [user, setUser] = useState<{ token: string } | null>(null);
-  const [dailyInventory, setDailyInventory] = useState<InventoryData | null>(null);
+  const [dailyInventory, setDailyInventory] = useState<InventoryData | null>(
+    null
+  );
+
+  const token = useToken();
 
   useEffect(() => {
-    handleGetUser();
-  }, []);
-
-  useEffect(() => {
-    if (user?.token) {
-      handleGetDailyInventoryReport(user.token);
+    if(token){
+      handleGetDailyInventoryList(token);
     }
-  }, [user]);
+  }, [token]);
 
-  const handleGetUser = () => {
-    const userCookie = getUser();
-    setUser(userCookie ?? null);
+  const handleGetDailyInventoryList = (token:string) => {
+    handleGetDailyInventoryReport(token);
   };
 
   const handleGetDailyInventoryReport = (token: string) => {
@@ -45,18 +45,18 @@ const Inventory = () => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="container my-3">
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={8}>
           <SimpleCard
             title="Total Inventory Count"
             value={dailyInventory?.total_inventory_count ?? "--"}
             backgroundColor="#f6ffed"
-            color="red"
+            color="#00659b"
             icon={
               <span className="iconWrapper">
                 <img
-                  src={Images.dashboard}
+                  src={Images.milkBottle}
                   alt="dashboard"
                   className="pageIcon"
                 />
@@ -102,23 +102,21 @@ const Inventory = () => {
         </Col>
       </Row>
 
-     {dailyInventory ? (
-       <div className="my-5">
-        <InventoryChart data={dailyInventory}/>
-      </div>
-     ):(
-      <p>Loading inventory chart</p>
-     )}
-     
-     <DailyMilkReport/>
+      {dailyInventory ? (
+        <div className="my-5">
+          <InventoryChart data={dailyInventory} />
+        </div>
+      ) : (
+        <p>Loading inventory chart</p>
+      )}
 
-     <InventoryList/>
+      <DailyMilkReport />
 
+      <InventoryList />
 
-     {/* <VendorMilkReport/> */}
+      {/* <VendorMilkReport/> */}
 
-     {/* <SlotMappingList/> */}
-     
+      {/* <SlotMappingList/> */}
     </div>
   );
 };

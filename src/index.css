@@ -20,6 +20,11 @@
   font-style: normal;
 }
 
+h1, p, div {
+  font-family: 'Outfit', sans-serif;
+}
+
+
 
 body {
   font-family: 'Outfit', sans-serif;
@@ -32,13 +37,6 @@ body {
 }
 
 
-
-.bg-yellow{
-  background-color: rgb(234, 211, 80);
-}
-.text-white{
-  color: white;
-}
 
 
 /* 53379C */
@@ -54,9 +52,12 @@ body {
 }
 
 
+
 .ant-layout-sider.custom-sider .ant-menu-item {
   color: #ffff !important;
 }
+
+
 
 
 .ant-layout-sider.custom-sider .ant-menu-item:hover {
@@ -77,37 +78,27 @@ body {
 }
 
 
+/*  active pagination */
+.ant-pagination-item-active {
+  border-radius: 50% !important;          
+  border: none !important;   
+  background-color: #1C2939 !important;
+  color: rgb(252, 255, 252) !important;               
+  font-weight: bold;                     
+}
 
-/* 
-
-.ant-layout-sider.custom-sider {
-  background-color: #eafaf1 !important;
+/* circle */
+.ant-pagination-item {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 34px !important; 
+  text-align: center;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
-.ant-layout-sider.custom-sider .ant-menu {
-  background-color: #eafaf1 !important;
-  color: #2c3e50 !important;
+.add-btn{
+  padding: 0 2rem !important; 
 }
-
-
-.ant-layout-sider.custom-sider .ant-menu-item {
-  color: #2c3e50 !important;
-}
-
-
-.ant-layout-sider.custom-sider .ant-menu-item:hover {
-  background-color: #c8e6d0 !important;
-  color: #ffffff !important;
-}
-
-
-.ant-layout-sider.custom-sider .ant-menu-item-selected {
-  background-color: #a0d8b3 !important;
-  color: #ffffff !important;
-}
-
-
-.ant-layout-sider.custom-sider .ant-menu-item .anticon {
-  color: #2c3e50 !important;
-} */

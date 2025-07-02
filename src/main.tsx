@@ -1,20 +1,19 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import './index.css';
+import "./index.css";
 
 import App from "./App.tsx";
-import { UserProvider } from "./Context/UserContext.tsx";
-import { LoaderProvider } from "./Context/LoaderContext.tsx";
+
+
+import { Provider } from "react-redux";
+import { store } from "./Store/Store.ts";
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <LoaderProvider>
-    <UserProvider>
+  <Provider store={store}>
+  
       <App />
-    </UserProvider>
-    </LoaderProvider>
-  </StrictMode>
+
+  </Provider>
 );
 
 // npm install react@18 react-dom@18

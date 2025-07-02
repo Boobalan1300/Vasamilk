@@ -1,3 +1,4 @@
+
 import ForgetPassword from "../Screens/Auth/ForgetPassword";
 import Login from "../Screens/Auth/Login";
 import ResetPassword from "../Screens/Auth/ResetPassword";
@@ -9,11 +10,15 @@ export const AuthRouter = [
   { path: "/login", element: <Login /> },
   { path: "/forget-password", element: <ForgetPassword /> },
   {
-    path: "/verify-otp",
-    element: <ProtectedRoute authType="otp" element={<VerifyOtp />} />,
+    element: <ProtectedRoute authType="otp" />,
+    children: [
+      { path: "/verify-otp", element: <VerifyOtp /> }
+    ],
   },
   {
-    path: "/resetPassword",
-    element: <ProtectedRoute authType="reset" element={<ResetPassword />} />,
+    element: <ProtectedRoute authType="reset" />,
+    children: [
+      { path: "/resetPassword", element: <ResetPassword /> }
+    ],
   },
 ];

@@ -1,14 +1,29 @@
 
-import { Button as AntButton, type ButtonProps as AntButtonProps } from "antd"
-type ButtonProps= AntButtonProps & {
-    children:React.ReactNode
-}
-const Button:React.FC<ButtonProps>=({children,...props})=>{
-    return(
-        <AntButton {...props}>
-            {children}
-        </AntButton>
-    )
+
+
+import React from "react";
+
+interface CustomButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string;
+  type?: "button" | "submit" | "reset";
 }
 
-export default Button
+const CustomButton: React.FC<CustomButtonProps> = ({
+  className = "",
+  type = "button", 
+  children,
+  ...rest
+}) => {
+  return (
+    <button
+      type={type}
+      className={` ${className}`} 
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+};
+
+export default CustomButton;
+
