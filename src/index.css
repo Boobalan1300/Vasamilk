@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "Outfit";
+  font-family: "Outfit-Reg";
   src: url("./assets/Fonts/Outfit-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -29,6 +29,7 @@
   /* --text-secondary: #7A73D1; */
 
   --text-white: #ffffff;
+   --text-black: #000000;
 
 
   --error-bg: #ff7575;
@@ -40,13 +41,16 @@
 
   --menu-hover-bg: #344153;
   --menu-selected-bg: #657d9f;
+
+   --light-selected:#a2db47;
+   --font-family-reg-outfit:"Outfit-Reg"
 }
 
 /* colors */
 /* 104d5d */
 
 h1,p,div {
-  font-family: "Outfit", sans-serif;
+  font-family: var(--font-family-reg-outfit);
 }
 
 * {

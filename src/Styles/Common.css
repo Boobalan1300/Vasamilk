@@ -1,8 +1,8 @@
-.AuthButton{
-    background-color:var(--primary-color);
-       
-    color: var(--text-white);
-    padding: 0.5rem 1rem;
+.AuthButton {
+  background-color: var(--primary-color);
+
+  color: var(--text-white);
+  padding: 0.5rem 1rem;
 }
 
 .iconWrapper {
@@ -22,24 +22,37 @@
   height: 40px;
 }
 
-.box-shadow{
-     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+.box-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* buttons */
+.btn-selected-square{
+   background-color: var(--light-selected) !important;
+  color: var(--text-black) !important;
+   border: none !important;
+}
 
-
-.btn-submit {
-  background-color: var(--success-bg) !important;
-color:var(--text-white) !important;
-  border-radius: 20px !important;
+.btn-light-grey-square {
+  color: var(--text-black) !important;
   border: none !important;
   transition: all 0.3s ease;
 }
 
 
+
+
+.btn-submit {
+  background-color: var(--success-bg) !important;
+  color: var(--text-white) !important;
+  border-radius: 20px !important;
+  border: none !important;
+  transition: all 0.3s ease;
+}
+
 .btn-submit:hover {
-  background-color: var( --success-hover-bg) !important;
-  color:var(--text-white) !important;
+  background-color: var(--success-hover-bg) !important;
+  color: var(--text-white) !important;
   border-color: white !important;
   transform: scale(1.05);
 }
@@ -52,12 +65,9 @@ color:var(--text-white) !important;
   transition: all 0.3s ease;
 }
 
-
 .btn-error:hover {
   background-color: var(--error-hover-bg) !important;
   color: white !important;
-  border-color:var(--text-white) !important;
+  border-color: var(--text-white) !important;
   transform: scale(1.05);
 }
-
-

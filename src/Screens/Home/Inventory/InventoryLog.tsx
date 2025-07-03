@@ -8,7 +8,6 @@ import CustomButton from "../../../Components/Button";
 import { Tag } from "antd";
 
 const ListLog = () => {
-  
   const navigate = useNavigate();
   const { showLoader, hideLoader } = useLoader();
   const token = useToken();
@@ -17,23 +16,22 @@ const ListLog = () => {
   const location = useLocation();
   const inventoryId = location.state?.inventoryId;
   const [searchParams] = useSearchParams();
-  const page = searchParams.get("page") || "1";
-
+  const page = parseInt(searchParams.get("page") || "1", 10);
 
   useEffect(() => {
     if (token && inventoryId) {
-      fetchInventoryLog(token);
+      fetchInventoryLog();
     }
   }, [token, inventoryId]);
 
-  const fetchInventoryLog = (token: string) => {
+  const fetchInventoryLog = () => {
     showLoader();
-    GetInventoryLog({
-      token,
-      inventory_id: Number(inventoryId),
-      page: 1,
-      size: 100,
-    })
+
+    const formData = new FormData();
+    formData.append("token", token || "");
+    formData.append("inventory_id", String(inventoryId));
+
+    GetInventoryLog(formData, 1, 50)
       .then((res) => {
         if (res.data.status === 1) {
           setLogData(res.data.data);

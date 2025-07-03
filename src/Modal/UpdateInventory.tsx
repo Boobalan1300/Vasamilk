@@ -36,39 +36,37 @@ const UpdateInventoryForm = ({
   });
   const [loading, setLoading] = useState(true);
 
-  const fetchInventoryData = () => {
-    if (!token) {
-      toast.error("Authentication token missing");
-      setLoading(false);
-      return;
-    }
+const fetchInventoryData = () => {
+  if (!token) return
 
-    GetInventoryList({
-      token,
-      page: 1,
-      size: 100,
-    })
-      .then((res) => {
-        if (res?.data?.status === 1) {
-          const item = res.data.data.find((inv: any) => inv.id === inventoryId);
-          if (item) {
-            setInitialValues({
-              inventory_id: inventoryId,
-              total_quantity: String(item.total_quantity || ""),
-              comment: item.comment || "",
-            });
-          }
+  const formData = new FormData();
+  formData.append("token", token);
+
+  GetInventoryList(formData)
+    .then((res) => {
+      if (res?.data?.status === 1) {
+        const item = res.data.data.find((inv: any) => inv.id === inventoryId);
+        if (item) {
+          setInitialValues({
+            inventory_id: inventoryId,
+            total_quantity: String(item.total_quantity || ""),
+            comment: item.comment || "",
+          });
         } else {
-          toast.error("Failed to fetch inventory details");
+          toast.error("Inventory item not found");
         }
-      })
-      .catch(() => {
-        toast.error("Something went wrong while fetching inventory details");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
+      } else {
+        toast.error(res.data.msg || "Failed to fetch inventory details");
+      }
+    })
+    .catch(() => {
+      toast.error("Something went wrong while fetching inventory details");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+};
+
 
   useEffect(() => {
     if (visible) fetchInventoryData();

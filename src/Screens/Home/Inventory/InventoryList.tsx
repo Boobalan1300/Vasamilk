@@ -54,36 +54,37 @@ const InventoryList = () => {
     fetchInventory();
   }, [pagination.current, pagination.pageSize]);
 
-  const fetchInventory = () => {
-    showLoader();
+const fetchInventory = () => {
+  if (!token) return;
+  showLoader();
 
-    GetInventoryList({
-      page: pagination.current,
-      size: pagination.pageSize,
-      token: token || "",
+  const formData = new FormData();
+  formData.append("token", token);
+
+  GetInventoryList(formData, pagination.current, pagination.pageSize)
+    .then((res) => {
+      if (res.data.status === 1) {
+        setInventoryList(res.data.data);
+        setIsAddAllowed(res.data.is_add_status === 1);
+        setIsUpdateAllowed(res.data.is_update_status === 1);
+        setActiveSlot(res.data.active_slot_data || null);
+
+        setPagination((prev) => ({
+          ...prev,
+          total: res.data.total || res.data.data.length,
+        }));
+      } else {
+        toast.error(res.data.msg || "Failed to fetch inventory.");
+      }
     })
-      .then((res) => {
-        if (res.data.status === 1) {
-          setInventoryList(res.data.data);
-          setIsAddAllowed(res.data.is_add_status === 1);
-          setIsUpdateAllowed(res.data.is_update_status === 1);
-          setActiveSlot(res.data.active_slot_data || null);
+    .catch(() => {
+      toast.error("Something went wrong");
+    })
+    .finally(() => {
+      hideLoader();
+    });
+};
 
-          setPagination((prev) => ({
-            ...prev,
-            total: res.data.total || res.data.data.length,
-          }));
-        } else {
-          toast.error(res.data.msg || "Failed to fetch inventory.");
-        }
-      })
-      .catch(() => {
-        toast.error("Something went wrong");
-      })
-      .finally(() => {
-        hideLoader();
-      });
-  };
 
 
   const handleView = (record: any) => {

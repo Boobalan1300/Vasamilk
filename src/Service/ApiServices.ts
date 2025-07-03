@@ -45,16 +45,7 @@ export const viewUser = (formData: FormData) => {
   return axios.post("/milk-api/user/view-user", formData);
 };
 
-export const fetchSlotDropDown = (token: string) => {
-  const formData = new URLSearchParams();
-  formData.append("token", token);
 
-  return axios.post("/milk-api/drop-down/slot-drop-down", formData.toString(), {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
-};
 
 export const fetchLinesDropDown = (formData: FormData) => {
   return axios.post("/milk-api/drop-down/lines-drop-down", formData);
@@ -78,36 +69,18 @@ export const GetDailyInventoryReport = (fromData: any) => {
   return axios.post("/milk-api/dashboard/daily-inventory-report", fromData);
 };
 
-interface InventoryListParams {
-  page: number;
-  size: number;
-  token: string;
-}
-
-export const GetInventoryList = ({
-  page,
-  size,
-  token,
-}: InventoryListParams) => {
-  const form = new URLSearchParams();
-  form.append("token", token);
-
-  return axios.post(
-    `/milk-api/inventorylist-inventory?page=${page}&size=${size}`,
-    form
-  );
+export const GetInventoryList = (formData: FormData, page = 1, size = 10) => {
+  return axios.post(`/milk-api/inventorylist-inventory?page=${page}&size=${size}`,formData);
 };
 
-export const GetInventoryLog = ({ token, inventory_id, page, size }: any) => {
-  const form = new URLSearchParams();
-  form.append("token", token);
-  form.append("inventory_id", String(inventory_id));
 
+export const GetInventoryLog = (formData: FormData, page = 1, size = 10) => {
   return axios.post(
     `/milk-api/inventory/list-inventory-log?page=${page}&size=${size}`,
-    form
+    formData
   );
 };
+
 
 export const AddInventory = (formData: FormData) => {
   return axios.post("/milk-api/inventory/add-inventory", formData);
@@ -131,19 +104,13 @@ export const GetVendorMilkReport = (formData: FormData) => {
 };
 
 
-
-
 export const GetDistributorLines =(formData:FormData)=>{
     return axios.post("/milk-api/slot-assign/get-distributer-line", formData);
 }
 
 
 //not used
-export const GetDistributorInventoryLog = (
-  formData: FormData,
-  page: number = 1,
-  size: number = 50
-) => {
+export const GetDistributorInventoryLog = ( page=1, size=50,formData: FormData) => {
   return axios.post(
     `/milk-api/milk-sales/list-distributor-log?page=${page}&size=${size}`,
     formData
@@ -159,6 +126,7 @@ export const GetSlotMapping = (formData: FormData, page = 1, size = 10) => {
     formData
   );
 };
+
 
 
 
@@ -180,21 +148,27 @@ export const AssignDistributorSlotMap = (payload:object) => {
 };
 
 
-
-
-
 export const GetCustomers = (formData: FormData) => {
   return axios.post(`/milk-api/drop-down/customer-drop-down`, formData);
 };
 
 
-export const ListAssignedSlot = (
-  page: number = 1,
-  size: number = 10,
-  payload: any
-) => {
+export const ListAssignedSlot = ( page=1, size=10, payload:any) => {
   return axios.post(
     `/milk-api/slot-assign/list-assigned-slot?page=${page}&size=${size}`,
     payload
   );
 };
+
+
+
+// ---------   Distributor  Dashboard  ------------
+
+
+export const GetReportByDate =(formData:FormData)=>{
+  return axios.post(`/milk-api/dashboard/daily-inventory-report-by-date`,formData)
+}
+
+// fetchLinesDropDown  - /milk-api/drop-down/lines-drop-down
+
+// GetSlotMapping  - /milk-api/milk-sales/list-slot-mapping
