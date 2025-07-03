@@ -3,13 +3,16 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import {AssignDistributorSlotMap,GetCustomers} from "../../../Service/ApiServices";
+import {
+  AssignDistributorSlotMap,
+  GetCustomers,
+} from "../../../Service/ApiServices";
 import { useToken } from "../../../Hooks/UserHook";
 import CustomDropDown from "../../../Components/CustomDropDown";
 import CustomButton from "../../../Components/Button";
 import CustomDatePicker from "../../../Components/CustomDatePicker";
 import styles from "./Distributor.module.css";
-import {Select, Spin,Divider,Card,Row,Col} from "antd";
+import { Select, Spin, Divider, Card, Row, Col } from "antd";
 
 type SlotFormValues = {
   assign_type: string;
@@ -30,8 +33,7 @@ interface CustomerOption {
   value: string;
 }
 
-
- const assignDistributorSchema = Yup.object().shape({
+const assignDistributorSchema = Yup.object().shape({
   distributer_id: Yup.string().required("Distributor is required"),
   slot_id: Yup.string().required("Slot is required"),
   slots: Yup.array().of(
@@ -55,10 +57,15 @@ interface CustomerOption {
   ),
 });
 
+
 const AssignDistributor = () => {
   const token = useToken();
-  const [customers, setCustomers] = useState<Record<number, CustomerOption[]>>({});
-  const [loadingCustomers, setLoadingCustomers] = useState< Record<number, boolean>>({});
+  const [customers, setCustomers] = useState<Record<number, CustomerOption[]>>(
+    {}
+  );
+  const [loadingCustomers, setLoadingCustomers] = useState<
+    Record<number, boolean>
+  >({});
 
   const formik = useFormik<AssignDistributorFormValues>({
     initialValues: {
@@ -74,14 +81,13 @@ const AssignDistributor = () => {
         },
       ],
     },
-  validationSchema: assignDistributorSchema,
+    validationSchema: assignDistributorSchema,
     onSubmit: (values) => handleSubmit(values),
   });
 
   const { values, setFieldValue, handleBlur, touched, errors } = formik;
 
-
-    const handleSubmit = (values: AssignDistributorFormValues) => {
+  const handleSubmit = (values: AssignDistributorFormValues) => {
     if (!token) return;
 
     const lineData = values.slots.map((slot) => {
@@ -135,9 +141,6 @@ const AssignDistributor = () => {
     }
   }, [values.slots, values.slot_id, token]);
 
-
-
-
   const fetchCustomersForSlots = (
     slots: any[],
     slotId: string,
@@ -182,12 +185,11 @@ const AssignDistributor = () => {
     });
   };
 
-    const getCustomerType = (assignType: string) => {
+  const getCustomerType = (assignType: string) => {
     if (assignType === "0") return "3";
     if (assignType === "1") return "2";
     return "4";
   };
-
 
   return (
     <div className="container my-3">
@@ -223,18 +225,17 @@ const AssignDistributor = () => {
 
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <div className="fw-bold fs-5">Assignment Details</div>
-                 <CustomButton
-  className="btn-error btn-sm px-2 py-1"
-  disabled={values.slots.length === 1}
-  onClick={() => {
-    const updatedSlots = [...values.slots];
-    updatedSlots.splice(idx, 1);
-    setFieldValue("slots", updatedSlots);
-  }}
->
-  Remove
-</CustomButton>
-
+                  <CustomButton
+                    className="btn-error btn-sm px-2 py-1"
+                    disabled={values.slots.length === 1}
+                    onClick={() => {
+                      const updatedSlots = [...values.slots];
+                      updatedSlots.splice(idx, 1);
+                      setFieldValue("slots", updatedSlots);
+                    }}
+                  >
+                    Remove
+                  </CustomButton>
                 </div>
 
                 <Row gutter={[16, 16]}>
@@ -254,42 +255,41 @@ const AssignDistributor = () => {
                   </Col>
                 </Row>
 
-{isTemporary && (
-  <Row gutter={[16, 16]}>
-    <Col xs={24} md={12}>
-      <CustomDatePicker
-        label="From Date"
-        value={slot.from_date}
-        onChange={(date) =>
-          setFieldValue(
-            `slots[${idx}].from_date`,
-            date ? dayjs(date).format("YYYY-MM-DD") : ""
-          )
-        }
-        onBlur={handleBlur}
-        error={slotErrors.from_date}
-        touched={slotTouched.from_date}
-      />
-    </Col>
+                {isTemporary && (
+                  <Row gutter={[16, 16]}>
+                    <Col xs={24} md={12}>
+                      <CustomDatePicker
+                        label="From Date"
+                        value={slot.from_date}
+                        onChange={(date) =>
+                          setFieldValue(
+                            `slots[${idx}].from_date`,
+                            date ? dayjs(date).format("YYYY-MM-DD") : ""
+                          )
+                        }
+                        onBlur={handleBlur}
+                        error={slotErrors.from_date}
+                        touched={slotTouched.from_date}
+                      />
+                    </Col>
 
-    <Col xs={24} md={12}>
-      <CustomDatePicker
-        label="To Date"
-        value={slot.to_date}
-        onChange={(date) =>
-          setFieldValue(
-            `slots[${idx}].to_date`,
-            date ? dayjs(date).format("YYYY-MM-DD") : ""
-          )
-        }
-        onBlur={handleBlur}
-        error={slotErrors.to_date}
-        touched={slotTouched.to_date}
-      />
-    </Col>
-  </Row>
-)}
-
+                    <Col xs={24} md={12}>
+                      <CustomDatePicker
+                        label="To Date"
+                        value={slot.to_date}
+                        onChange={(date) =>
+                          setFieldValue(
+                            `slots[${idx}].to_date`,
+                            date ? dayjs(date).format("YYYY-MM-DD") : ""
+                          )
+                        }
+                        onBlur={handleBlur}
+                        error={slotErrors.to_date}
+                        touched={slotTouched.to_date}
+                      />
+                    </Col>
+                  </Row>
+                )}
 
                 {slot.assign_type &&
                   (!isTemporary ||
@@ -386,7 +386,9 @@ const AssignDistributor = () => {
               </CustomButton>
             </Col>
             <Col>
-              <CustomButton type="submit" className="btn btn-sm btn-submit">Submit Assignment</CustomButton>
+              <CustomButton type="submit" className="btn btn-sm btn-submit">
+                Submit Assignment
+              </CustomButton>
             </Col>
           </Row>
         </form>

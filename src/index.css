@@ -30,15 +30,20 @@
 
   --text-white: #ffffff;
 
-  --error-bg: #e11c47;
-  --error-hover-bg: #de3458;
 
-  --success-bg: #89d235 ;
-  --success-hover-bg: #7dbf31;
+  --error-bg: #ff7575;
+    --error-hover-bg: #f84444;
+ /* 89d235 */
+/* 7dbf31  */
+  --success-bg: #2490be ;
+  --success-hover-bg: #1b8bbb;
 
   --menu-hover-bg: #344153;
   --menu-selected-bg: #657d9f;
 }
+
+/* colors */
+/* 104d5d */
 
 h1,p,div {
   font-family: "Outfit", sans-serif;

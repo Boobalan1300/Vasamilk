@@ -1,19 +1,14 @@
 import React from "react";
-import { Calendar, Card, Row, Col, Statistic } from "antd";
-// import type { CalendarMode } from "antd/es/calendar/generateCalendar";
-import dayjs, { Dayjs } from "dayjs";
+import { Card, Row, Col, Statistic } from "antd";
+import { Dayjs } from "dayjs";
 import CustomTable from "../../../Components/CustomTable";
+import CustomCalendar from "../../../Components/CustomCalendar";
+import { TODAY } from "../../../Utils/Data/constants";
 
 const DistributorDashboard: React.FC = () => {
-  const today = dayjs();
-
-//   const onPanelChange = (value: Dayjs, mode: CalendarMode) => {
-//     console.log(value.format("YYYY-MM-DD"), mode);
-//   };
 
   const disabledDate = (current: Dayjs) => {
-
-    return current && current > today.endOf("day");
+    return current && current > TODAY.endOf("day");
   };
 
   const tableColumns = [
@@ -48,15 +43,11 @@ const DistributorDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="container" >
-      <Row gutter={[16,16]} >
+    <div className="container">
+      <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           <Card title="Select Date">
-            <Calendar
-              fullscreen={false}
-              disabledDate={disabledDate}
-            //   onPanelChange={onPanelChange}
-            />
+            <CustomCalendar disabledDate={disabledDate} />
           </Card>
         </Col>
 
@@ -65,6 +56,11 @@ const DistributorDashboard: React.FC = () => {
             <Col span={12}>
               <Card>
                 <Statistic title="Total Milk Today" value="1000 L" />
+              </Card>
+            </Col>
+             <Col span={12}>
+              <Card>
+                <Statistic title="Routes to Cover" value={15} />
               </Card>
             </Col>
             <Col span={12}>
@@ -77,11 +73,7 @@ const DistributorDashboard: React.FC = () => {
                 <Statistic title="Evening Slot" value="400 L" />
               </Card>
             </Col>
-            <Col span={12}>
-              <Card>
-                <Statistic title="Routes to Cover" value={15} />
-              </Card>
-            </Col>
+           
             <Col span={24}>
               <Card>
                 <Statistic title="Number of Customers" value={120} />
@@ -91,10 +83,7 @@ const DistributorDashboard: React.FC = () => {
         </Col>
       </Row>
 
-      <Card
-        title="Customer Slots Details"
-        style={{ marginTop: 24 }}
-      >
+      <Card title="Customer Slots Details" style={{ marginTop: 24 }}>
         <CustomTable columns={tableColumns} data={tableData} />
       </Card>
     </div>

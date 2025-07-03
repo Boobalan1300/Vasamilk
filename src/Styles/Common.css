@@ -45,7 +45,7 @@ color:var(--text-white) !important;
 }
 
 .btn-error {
-  background-color: var(--error-hover-bg) !important;
+  background-color: var(--error-bg) !important;
   color: white !important;
   border-radius: 20px !important;
   border: none !important;
@@ -54,7 +54,7 @@ color:var(--text-white) !important;
 
 
 .btn-error:hover {
-  background-color: var(--error-bg) !important;
+  background-color: var(--error-hover-bg) !important;
   color: white !important;
   border-color:var(--text-white) !important;
   transform: scale(1.05);

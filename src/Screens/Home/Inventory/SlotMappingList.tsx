@@ -1,6 +1,3 @@
-
-
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -10,6 +7,8 @@ import CustomTable from "../../../Components/CustomTable";
 import CustomPagination from "../../../Components/CustomPagination";
 import CustomButton from "../../../Components/Button";
 import type { ColumnsType } from "antd/es/table";
+
+import { TODAY } from "../../../Utils/Data/constants";
 
 interface SlotMappingRecord {
   slot_log_id: number;
@@ -38,10 +37,12 @@ const SlotMappingList = () => {
   const location = useLocation();
   const [data, setData] = useState<SlotMappingRecord[]>([]);
   const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 }); 
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+  });
   const { slotId, givenType } = location.state || {};
-
-
 
   useEffect(() => {
     if (token) fetchData(token, pagination.current, pagination.pageSize);
@@ -52,8 +53,7 @@ const SlotMappingList = () => {
     const formData = new FormData();
     formData.append("token", token);
 
-    const today = new Date();
-    const fromDate = today.toISOString().split("T")[0]; 
+    const fromDate = TODAY.format("YYYY-MM-DD");
     formData.append("from_date", fromDate);
 
     if (slotId) formData.append("slot_id", slotId.toString());
@@ -73,7 +73,7 @@ const SlotMappingList = () => {
     setPagination((prev) => ({ ...prev, current: page, pageSize }));
   };
 
-    const getTitle = () => {
+  const getTitle = () => {
     let slotLabel = "";
     let whoLabel = "";
 
@@ -87,7 +87,6 @@ const SlotMappingList = () => {
 
     return `${slotLabel} - ${whoLabel} Slot Mappings`;
   };
-
 
   const columns: ColumnsType<SlotMappingRecord> = [
     {
@@ -159,8 +158,8 @@ const SlotMappingList = () => {
 
   return (
     <>
-          <div className="d-flex justify-content-between align-items-center my-4">
-         <h4 className="">{getTitle()}</h4>
+      <div className="d-flex justify-content-between align-items-center my-4">
+        <h4 className="">{getTitle()}</h4>
         <CustomButton
           className="btn-grey px-2 py-1"
           onClick={() => navigate(-1)}
@@ -168,7 +167,6 @@ const SlotMappingList = () => {
           Back
         </CustomButton>
       </div>
-    
 
       <CustomTable
         columns={columns}
