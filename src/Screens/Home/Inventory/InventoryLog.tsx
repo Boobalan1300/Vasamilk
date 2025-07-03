@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
-import { Tag } from "antd";
-import { GetInventoryLog } from "../../../Service/ApiServices";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-
+import { GetInventoryLog } from "../../../Service/ApiServices";
 import CustomTable from "../../../Components/CustomTable";
 import { useLoader } from "../../../Hooks/useLoader";
 import { useToken } from "../../../Hooks/UserHook";
 import CustomButton from "../../../Components/Button";
+import { Tag } from "antd";
 
 const ListLog = () => {
+  
+  const navigate = useNavigate();
+  const { showLoader, hideLoader } = useLoader();
+  const token = useToken();
+
   const [logData, setLogData] = useState<any[]>([]);
   const location = useLocation();
   const inventoryId = location.state?.inventoryId;
   const [searchParams] = useSearchParams();
   const page = searchParams.get("page") || "1";
-  const navigate = useNavigate();
-  const { showLoader, hideLoader } = useLoader();
-  const token = useToken();
+
 
   useEffect(() => {
     if (token && inventoryId) {

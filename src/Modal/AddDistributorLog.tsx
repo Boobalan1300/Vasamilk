@@ -3,12 +3,12 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AddDistributorInventoryLog } from "../Service/ApiServices";
 import { useToken } from "../Hooks/UserHook";
 import CustomDropDown from "../Components/CustomDropDown";
 import FormField from "../Components/InputField";
-import CustomModal from "../Components/CustomModal";
-import { AddDistributorInventoryLog } from "../Service/ApiServices";
 import CustomButton from "../Components/Button";
+import CustomModal from "../Components/CustomModal";
 
 interface Props {
   visible: boolean;
@@ -16,11 +16,43 @@ interface Props {
   onSuccess: () => void;
 }
 
+const getDistributorLogValidationSchema = () =>
+  Yup.object({
+    distributer_id: Yup.string().required("Distributor is required"),
+    given_qty: Yup.number()
+      .min(1, "Minimum quantity is 1")
+      .required("Quantity is required"),
+    type: Yup.number().required("Type is required"),
+  });
+
 const AddDistributorLogModal = ({ visible, onClose, onSuccess }: Props) => {
   const [formLoading, setFormLoading] = useState(false);
   const token = useToken();
 
-  const submitDistributorLog = (values: any) => {
+
+
+  const {
+    values,
+    errors,
+    touched,
+    handleSubmit,
+    handleChange,
+    handleBlur,
+    setFieldValue,
+    resetForm,
+  } = useFormik({
+    initialValues: {
+      distributer_id: "",
+      given_qty: 1,
+      type: "",
+    },
+    validationSchema: getDistributorLogValidationSchema(),
+    onSubmit: (values) => submitDistributorLog(values),
+    validateOnChange: false,
+    validateOnBlur: true,
+  });
+
+    const submitDistributorLog = (values: any) => {
     if (!token) return;
 
     const formData = new FormData();
@@ -49,33 +81,6 @@ const AddDistributorLogModal = ({ visible, onClose, onSuccess }: Props) => {
         setFormLoading(false);
       });
   };
-
-  const {
-    values,
-    errors,
-    touched,
-    handleSubmit,
-    handleChange,
-    handleBlur,
-    setFieldValue,
-    resetForm,
-  } = useFormik({
-    initialValues: {
-      distributer_id: "",
-      given_qty: 1,
-      type: "",
-    },
-    validationSchema: Yup.object({
-      distributer_id: Yup.string().required("Distributor is required"),
-      given_qty: Yup.number()
-        .min(1, "Minimum quantity is 1")
-        .required("Quantity is required"),
-      type: Yup.number().required("Type is required"),
-    }),
-    validateOnChange: false,
-    validateOnBlur: true,
-    onSubmit: submitDistributorLog,
-  });
 
   return (
     <CustomModal

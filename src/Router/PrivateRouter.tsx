@@ -10,8 +10,8 @@ export const AuthPrivate = () => {
   if (!token) return <Outlet />;
 
   return user_type === 1 ? <Navigate to="/inventory" replace /> :
-         user_type === 2 ? <Navigate to="/distributorDashboard" replace /> :
-         user_type === 3 ? <Navigate to="/vendorDashboard" replace /> :
+        //  user_type === 2 ? <Navigate to="/distributorDashboard" replace /> :
+         user_type === 4 ? <Navigate to="/distributorDashboard" replace /> :
          <Navigate to="*" replace />;
 };
 
@@ -43,8 +43,8 @@ export const PrivateRoute = ({ allowedUserTypes }: { allowedUserTypes: number[] 
 
  if (!allowedUserTypes.includes(user_type ?? -1)) {
     return user_type === 1 ? <Navigate to="/inventory" replace /> :
-           user_type === 2 ? <Navigate to="/distributorDashboard" replace /> :
-           user_type === 3 ? <Navigate to="/vendorDashboard" replace /> :
+          //  user_type === 2 ? <Navigate to="/distributorDashboard" replace /> :
+           user_type === 4 ? <Navigate to="/distributorDashboard" replace /> :
            <Navigate to="*" replace />;
   }
 

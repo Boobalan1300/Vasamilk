@@ -9,7 +9,6 @@ const { Content } = Layout;
 
 const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
-
   const toggleSidebar = () => setCollapsed((prev) => !prev);
 
   return (

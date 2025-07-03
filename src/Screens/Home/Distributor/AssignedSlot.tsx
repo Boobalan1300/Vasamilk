@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-
+import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ListAssignedSlot } from "../../../Service/ApiServices";
-import CustomTable from "../../../Components/CustomTable";
-import type { ColumnsType } from "antd/es/table";
 import { useLoader } from "../../../Hooks/useLoader";
 import { useToken } from "../../../Hooks/UserHook";
-import { toast } from "react-toastify";
+import CustomTable from "../../../Components/CustomTable";
 import CustomButton from "../../../Components/Button";
 import { Tag } from "antd";
+import type { ColumnsType } from "antd/es/table";
 
 interface AssignedSlotType {
   id: number;

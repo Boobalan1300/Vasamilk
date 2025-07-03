@@ -2,8 +2,6 @@
 import CreateUser from "../Screens/Home/User/CreateUser";
 import UserList from "../Screens/Home/User/UserList";
 import Inventory from "../Screens/Home/Inventory/Inventory";
-// import DistributorDashboard from "../Screens/Distributor/DistributorDashboard";
-// import VendorDashboard from "../Screens/Vendor/VendorDashboard";
 import MainLayout from "../Layout/MainLayout";
 import { PrivateRoute } from "./PrivateRouter";
 import ListLog from "../Screens/Home/Inventory/InventoryLog";
@@ -12,6 +10,7 @@ import SlotMappingList from "../Screens/Home/Inventory/SlotMappingList";
 import DistributorList from "../Screens/Home/Distributor/DistributorList";
 import AssignedSlot from "../Screens/Home/Distributor/AssignedSlot";
 import AssignDistributor from "../Screens/Home/Distributor/AssignDistributor";
+import DistributorDashboard from "../Screens/Home/Distributor/DistributorDashboard";
 
 export const HomeRouter = [
   {
@@ -36,16 +35,9 @@ export const HomeRouter = [
       },
 
       {
-        element: <PrivateRoute allowedUserTypes={[2]} />,
+        element: <PrivateRoute allowedUserTypes={[4]} />,
         children: [
-            //   { path: "/vendorDashboard", element: <VendorDashboard /> },
-        ],
-      },
-
-      {
-        element: <PrivateRoute allowedUserTypes={[3]} />,
-        children: [
-            //   { path: "/distributorDashboard", element: <DistributorDashboard /> },
+              { path: "/distributorDashboard", element: <DistributorDashboard /> },
 
         ],
       },

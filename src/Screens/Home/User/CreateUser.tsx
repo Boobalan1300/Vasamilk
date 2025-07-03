@@ -1,22 +1,18 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { Select } from "antd";
-import { toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-
+import { useNavigate, useLocation } from "react-router-dom";
+import { useToken } from "../../../Hooks/UserHook";
 import {
   fetchUserById,
   handleCreateUser,
   handleEditUser,
 } from "../../../Service/ApiServices";
 import FormField from "../../../Components/InputField";
-import { useNavigate } from "react-router-dom";
-import { useToken } from "../../../Hooks/UserHook";
 import CustomDropDown from "../../../Components/CustomDropDown";
 import CustomButton from "../../../Components/Button";
-
+import { Select } from "antd";
 const { Option } = Select;
 
 interface SlotEntry {
@@ -100,14 +96,13 @@ const getValidationSchema = (isEdit: boolean) =>
   });
 
 const CreateUser = () => {
+  const token = useToken();
   const navigate = useNavigate();
   const location = useLocation();
   const id = location.state?.id;
   const isEdit = !!id;
 
   const [error, setError] = useState<string | null>(null);
-
-  const token = useToken();
 
   const {
     values,
@@ -117,7 +112,6 @@ const CreateUser = () => {
     handleBlur,
     handleSubmit,
     resetForm,
-
     setFieldValue,
     setValues,
   } = useFormik<FormValues>({
@@ -146,125 +140,123 @@ const CreateUser = () => {
     validateOnBlur: true,
   });
 
-  const submitUserForm = async (values: FormValues) => {
-    try {
-      const token = useToken();
+  const submitUserForm = (values: FormValues) => {
+    const token = useToken();
 
-      const isCustomer = values.user_type === "5";
-      const isRegularCustomer = isCustomer && values.customer_type === "1";
+    const isCustomer = values.user_type === "5";
+    const isRegularCustomer = isCustomer && values.customer_type === "1";
 
-      const morningSlot = values.slot_data?.[0] || {};
-      const eveningSlot = values.slot_data?.[1] || {};
+    const morningSlot = values.slot_data?.[0] || {};
+    const eveningSlot = values.slot_data?.[1] || {};
 
-      const slotData = isRegularCustomer
-        ? [
-            ...(morningSlot.quantity &&
-            morningSlot.method &&
-            morningSlot.start_date
-              ? [
-                  {
-                    id: morningSlot.id,
-                    slot_id: morningSlot.slot_id,
-                    quantity: parseFloat(morningSlot.quantity),
-                    method: parseInt(morningSlot.method, 10),
-                    start_date: morningSlot.start_date,
-                  },
-                ]
-              : []),
-            ...(eveningSlot.quantity && eveningSlot.method
-              ? [
-                  {
-                    id: eveningSlot.id,
-                    slot_id: eveningSlot.slot_id,
-                    quantity: parseFloat(eveningSlot.quantity),
-                    method: parseInt(eveningSlot.method, 10),
-                    start_date: morningSlot.start_date,
-                  },
-                ]
-              : []),
-          ]
-        : [];
+    const slotData = isRegularCustomer
+      ? [
+          ...(morningSlot.quantity &&
+          morningSlot.method &&
+          morningSlot.start_date
+            ? [
+                {
+                  id: morningSlot.id,
+                  slot_id: morningSlot.slot_id,
+                  quantity: parseFloat(morningSlot.quantity),
+                  method: parseInt(morningSlot.method, 10),
+                  start_date: morningSlot.start_date,
+                },
+              ]
+            : []),
+          ...(eveningSlot.quantity && eveningSlot.method
+            ? [
+                {
+                  id: eveningSlot.id,
+                  slot_id: eveningSlot.slot_id,
+                  quantity: parseFloat(eveningSlot.quantity),
+                  method: parseInt(eveningSlot.method, 10),
+                  start_date: morningSlot.start_date,
+                },
+              ]
+            : []),
+        ]
+      : [];
 
-      const payload: any = {
-        token,
+    const payload: any = {
+      token,
 
-        ...(values.name && { name: values.name }),
-        ...(values.user_name && { user_name: values.user_name }),
-        ...(values.email && { email: values.email }),
-        ...(values.phone && { phone: values.phone }),
-        ...(values.alternative_number && {
-          alternative_number: values.alternative_number,
-        }),
-        ...(values.user_type && { user_type: parseInt(values.user_type) }),
+      ...(values.name && { name: values.name }),
+      ...(values.user_name && { user_name: values.user_name }),
+      ...(values.email && { email: values.email }),
+      ...(values.phone && { phone: values.phone }),
+      ...(values.alternative_number && {
+        alternative_number: values.alternative_number,
+      }),
+      ...(values.user_type && { user_type: parseInt(values.user_type) }),
 
-        ...(isEdit && id
-          ? { id: parseInt(id) }
-          : { password: values.password }),
+      ...(isEdit && id ? { id: parseInt(id) } : { password: values.password }),
 
-        ...(isCustomer && {
-          customer_type: parseInt(values.customer_type),
-          line_id: parseInt(values.line_id),
-          price_tag_id: parseInt(values.price_tag_id),
-          pay_type: parseInt(values.pay_type),
-          ...(isRegularCustomer && { slot_data: slotData }),
-        }),
-      };
+      ...(isCustomer && {
+        customer_type: parseInt(values.customer_type),
+        line_id: parseInt(values.line_id),
+        price_tag_id: parseInt(values.price_tag_id),
+        pay_type: parseInt(values.pay_type),
+        ...(isRegularCustomer && { slot_data: slotData }),
+      }),
+    };
 
-      console.log("payload", payload);
+    console.log("payload", payload);
 
-      const request = isEdit ? handleEditUser : handleCreateUser;
-      const response = await request(payload);
+    const request = isEdit ? handleEditUser : handleCreateUser;
 
-      if (response?.data?.status === 1) {
-        toast.success(response.data.msg);
-        navigate("/userManagement");
-
-        resetForm();
-      } else {
-        toast.error(response.data.msg || "Something went wrong");
-      }
-    } catch (err) {
-      toast.error(isEdit ? "Failed to update user" : "Failed to create user");
-    }
+    request(payload)
+      .then((response) => {
+        if (response?.data?.status === 1) {
+          toast.success(response.data.msg);
+          navigate("/userManagement");
+          resetForm();
+        } else {
+          toast.error(response.data.msg || "Something went wrong");
+        }
+      })
+      .catch((err) => {
+        console.error("Submit error:", err);
+        toast.error(isEdit ? "Failed to update user" : "Failed to create user");
+      });
   };
 
-useEffect(() => {
-  if (id && token) {
-    loadUserDetails(id, token);
-  }
-}, [id, token]);
-
+  useEffect(() => {
+    if (id && token) {
+      loadUserDetails(id, token);
+    }
+  }, [id, token]);
 
   const loadUserDetails = (id: string, token: string) => {
-  const formData = new FormData();
-  formData.append("token", token);
-  formData.append("user_id", id);
+    const formData = new FormData();
+    formData.append("token", token);
+    formData.append("user_id", id);
 
-  fetchUserById(formData)
-    .then((res) => {
-      const data = res.data.data;
-      console.log(data)
+    fetchUserById(formData)
+      .then((res) => {
+        const data = res.data.data;
+        console.log(data);
 
-      setValues({
-        name: data.name || "",
-        user_name: data.user_name || "",
-        email: data.email || "",
-        phone: data.phone || "",
-        alternative_number: data.alternative_number || "",
-        user_type: String(data.user_type || ""),
-        customer_type: String(data.customer_type || ""),
-        line_id: String(data.line_name || ""),
-        price_tag_id: String(data.price_tag_name || ""),
-        pay_type: data.pay_type != null ? String(data.pay_type) : "",
-        slot_data: data.slot_data || [
-          { slot_id: 1, quantity: "", method: "", start_date: "" },
-          { slot_id: 2, quantity: "", method: "", start_date: "" },
-        ],
-        password: "",
-      });
-    })
-    .catch(() => setError("Failed to fetch user details"));
-};
+        setValues({
+          name: data.name || "",
+          user_name: data.user_name || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          alternative_number: data.alternative_number || "",
+          user_type: String(data.user_type || ""),
+          customer_type: String(data.customer_type || ""),
+          line_id: String(data.line_name || ""),
+          price_tag_id: String(data.price_tag_name || ""),
+          pay_type: data.pay_type != null ? String(data.pay_type) : "",
+          slot_data: data.slot_data || [
+            { slot_id: 1, quantity: "", method: "", start_date: "" },
+            { slot_id: 2, quantity: "", method: "", start_date: "" },
+          ],
+          password: "",
+        });
+      })
+      .catch(() => setError("Failed to fetch user details"));
+  };
 
   const methodOptions = [
     { label: "Direct", value: 1 },
@@ -273,7 +265,6 @@ useEffect(() => {
 
   const renderSlotField = (index: number, label: string) => (
     <>
-    
       <h5>{label}</h5>
 
       <div className="row">
@@ -333,9 +324,8 @@ useEffect(() => {
     <div className="container mt-4">
       {error && <div className="alert alert-danger">{error}</div>}
 
-
       <div className="d-flex justify-content-between align-items-center mb-3">
-  <h2>{isEdit ? "EDIT USER":"ADD USER" }</h2>
+        <h2>{isEdit ? "EDIT USER" : "ADD USER"}</h2>
 
         <CustomButton
           type="button"
@@ -346,10 +336,7 @@ useEffect(() => {
         </CustomButton>
       </div>
 
-
-      <div className="d-flex justify-content-between mb-3">
-      
-      </div>
+      <div className="d-flex justify-content-between mb-3"></div>
 
       <form onSubmit={handleSubmit}>
         <div className="row">
@@ -436,28 +423,11 @@ useEffect(() => {
           )}
         </div>
 
-        <div className="row">
-          <div className="col-md-6 mb-3">
-            <label>User Type</label>
-            <Select
-              allowClear
-              className="w-100"
-              placeholder="Select user type"
-              value={values.user_type || undefined}
-              onChange={(val) => {
-                setFieldValue("user_type", val ?? "");
-              }}
-            >
-              <Option value="2">Admin</Option>
-              <Option value="3">Vendor</Option>
-              <Option value="4">Distributor</Option>
-              <Option value="5">Customer</Option>
-            </Select>
-            {errors.user_type && touched.user_type && (
-              <div className="text-danger">{errors.user_type}</div>
-            )}
-          </div>
-        </div>
+        <CustomDropDown
+          dropdownKeys={["user_type"]}
+          formik={{ values, setFieldValue, handleBlur, touched, errors }}
+          className="col-12 col-md-6 mb-3"
+        />
 
         {values.user_type === "5" && (
           <>

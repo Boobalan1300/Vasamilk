@@ -1,23 +1,12 @@
-
-
-
-
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { UpdateInventory, GetInventoryList } from "../Service/ApiServices";
 import { useToken } from "../Hooks/UserHook";
 import FormField from "../Components/InputField";
-import { toast } from "react-toastify";
 import CustomModal from "../Components/CustomModal";
 import CustomButton from "../Components/Button";
-
-const updateInventoryValidationSchema = Yup.object({
-  total_quantity: Yup.number()
-    .required("Total quantity is required")
-    .min(1, "Must be at least 1"),
-  comment: Yup.string().required("Comment is required"),
-});
 
 interface UpdateInventoryFormProps {
   visible: boolean;
@@ -25,6 +14,13 @@ interface UpdateInventoryFormProps {
   onClose: () => void;
   onSuccess: () => void;
 }
+
+const updateInventoryValidationSchema = Yup.object({
+  total_quantity: Yup.number()
+    .required("Total quantity is required")
+    .min(1, "Must be at least 1"),
+  comment: Yup.string().required("Comment is required"),
+});
 
 const UpdateInventoryForm = ({
   visible,
@@ -78,6 +74,23 @@ const UpdateInventoryForm = ({
     if (visible) fetchInventoryData();
   }, [inventoryId, token, visible]);
 
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    isSubmitting,
+  } = useFormik({
+    enableReinitialize: true,
+    initialValues,
+    validationSchema: updateInventoryValidationSchema,
+    onSubmit: (values, { setSubmitting }) => {
+      handleUpdateInventory(values, setSubmitting);
+    },
+  });
+
   const handleUpdateInventory = (
     values: {
       inventory_id: number;
@@ -116,23 +129,6 @@ const UpdateInventoryForm = ({
       });
   };
 
-  const {
-    values,
-    errors,
-    touched,
-    handleChange,
-    handleBlur,
-    handleSubmit,
-    isSubmitting,
-  } = useFormik({
-    enableReinitialize: true,
-    initialValues,
-    validationSchema: updateInventoryValidationSchema,
-    onSubmit: (values, { setSubmitting }) => {
-      handleUpdateInventory(values, setSubmitting);
-    },
-  });
-
   return (
     <CustomModal
       open={visible}
@@ -169,13 +165,13 @@ const UpdateInventoryForm = ({
           />
         </div>
 
-<CustomButton
-  type="submit"
-  className="btn btn-sm btn-submit"
-  disabled={isSubmitting || loading}
->
-  {isSubmitting ? "Updating..." : "Update Inventory"}
-</CustomButton>
+        <CustomButton
+          type="submit"
+          className="btn btn-sm btn-submit"
+          disabled={isSubmitting || loading}
+        >
+          {isSubmitting ? "Updating..." : "Update Inventory"}
+        </CustomButton>
       </form>
     </CustomModal>
   );

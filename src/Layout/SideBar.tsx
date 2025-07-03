@@ -1,16 +1,15 @@
 
 
 import React from "react";
-import { Layout, Menu, message } from "antd";
-import { RightOutlined, LeftOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { Images } from "../Utils/Images";
-import "../Styles/Common.css";
-import { clearCookie } from "../Utils/Cookie";
 import { handleLogout } from "../Service/ApiServices";
 import { useUserType, useToken } from "../Hooks/UserHook";
+import { clearCookie } from "../Utils/Cookie";
+import { RightOutlined, LeftOutlined } from "@ant-design/icons";
 import CustomButton from "../Components/Button";
-
+import { Layout, Menu, message } from "antd";
+import "../Styles/Common.css";
 const { Sider } = Layout;
 
 type SideBarProps = {
@@ -86,8 +85,27 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
           },
         ]
       : []),
+      ...(userType === 4
+  ? [
+      {
+        key: "4",
+        icon: (
+          <span className="iconWrapper">
+            <img
+              src={Images.distributor}
+              alt="Distributor Dashboard"
+              className="iconStyle"
+            />
+          </span>
+        ),
+        label: " Dashboard",
+        onClick: () => navigate("/distributorDashboard"),
+      },
+    ]
+  : []),
+
     {
-      key: "4",
+      key: "5",
       icon: (
         <span className="iconWrapper">
           <img src={Images.logout} alt="Logout" className="iconStyle" />

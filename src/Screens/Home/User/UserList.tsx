@@ -1,22 +1,22 @@
 
 import { useEffect, useState } from "react";
-import { Tag, Switch, message, Popconfirm, Tooltip } from "antd";
-import type { ColumnsType } from "antd/es/table";
 import { useNavigate } from "react-router-dom";
-import CustomTable from "../../../Components/CustomTable";
-import CustomPagination from "../../../Components/CustomPagination";
-import ViewUser from "./ViewUser";
-import { Images } from "../../../Utils/Images";
-import { useToken } from "../../../Hooks/UserHook";
 import { useFormik } from "formik";
-import CustomDropDown from "../../../Components/CustomDropDown";
+import { useToken } from "../../../Hooks/UserHook";
 import { useLoader } from "../../../Hooks/useLoader";
-
 import {
   fetchUserList,
   changeUserStatus,
   viewUser,
 } from "../../../Service/ApiServices";
+import ViewUser from "./ViewUser";
+import CustomDropDown from "../../../Components/CustomDropDown";
+import CustomTable from "../../../Components/CustomTable";
+import CustomPagination from "../../../Components/CustomPagination";
+import { Images } from "../../../Utils/Images";
+import { Tag, Switch, message, Popconfirm, Tooltip } from "antd";
+import type { ColumnsType } from "antd/es/table";
+
 import CustomButton from "../../../Components/Button";
 
 interface ApiUser {
@@ -43,6 +43,8 @@ interface FilterValues {
 }
 
 const UserList = () => {
+    const navigate = useNavigate();
+  const token = useToken();
   const { showLoader, hideLoader } = useLoader();
   const [data, setData] = useState<ApiUser[]>([]);
   const [total, setTotal] = useState(0);
@@ -50,8 +52,7 @@ const UserList = () => {
   const [viewingUserId, setViewingUserId] = useState<number | null>(null);
   const [viewUserDetails, setViewUserDetails] = useState<any>(null);
 
-  const navigate = useNavigate();
-  const token = useToken();
+
 
   const formik = useFormik<FilterValues>({
     initialValues: {

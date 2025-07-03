@@ -34,10 +34,15 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    sessionStorage.removeItem("forgotInitiated");
-    sessionStorage.removeItem("otpVerified");
-    sessionStorage.removeItem("resetReached");
-  }, []);
+  clearForgotPasswordSession();
+}, []);
+
+
+const clearForgotPasswordSession = () => {
+  sessionStorage.removeItem("forgotInitiated");
+  sessionStorage.removeItem("otpVerified");
+  sessionStorage.removeItem("resetReached");
+};
 
   const handleLoginSubmit = (values: LoginFormType) => {
     const auth_code = sha1(SALT_KEY + values.userName);
@@ -51,6 +56,7 @@ const Login = () => {
     handleLogin(formData)
       .then((response) => {
         const { data } = response;
+        console.log(data)
 
         if (data.status === 1) {
           toast.success("Login successful!");

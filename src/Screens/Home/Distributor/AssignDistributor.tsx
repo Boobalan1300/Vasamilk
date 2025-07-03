@@ -1,25 +1,15 @@
 import { useEffect, useState } from "react";
-import {
-  DatePicker,
-  Select,
-  Spin,
-  Divider,
-  Card,
-  Row,
-  Col,
-} from "antd";
-import dayjs from "dayjs";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import CustomDropDown from "../../../Components/CustomDropDown";
-import {
-  AssignDistributorSlotMap,
-  GetCustomers,
-} from "../../../Service/ApiServices";
+import dayjs from "dayjs";
+import {AssignDistributorSlotMap,GetCustomers} from "../../../Service/ApiServices";
 import { useToken } from "../../../Hooks/UserHook";
-import styles from "./Distributor.module.css";
+import CustomDropDown from "../../../Components/CustomDropDown";
 import CustomButton from "../../../Components/Button";
+import CustomDatePicker from "../../../Components/CustomDatePicker";
+import styles from "./Distributor.module.css";
+import {Select, Spin,Divider,Card,Row,Col} from "antd";
 
 type SlotFormValues = {
   assign_type: string;
@@ -41,7 +31,7 @@ interface CustomerOption {
 }
 
 
-export const assignDistributorSchema = Yup.object().shape({
+ const assignDistributorSchema = Yup.object().shape({
   distributer_id: Yup.string().required("Distributor is required"),
   slot_id: Yup.string().required("Slot is required"),
   slots: Yup.array().of(
@@ -67,12 +57,8 @@ export const assignDistributorSchema = Yup.object().shape({
 
 const AssignDistributor = () => {
   const token = useToken();
-  const [customers, setCustomers] = useState<Record<number, CustomerOption[]>>(
-    {}
-  );
-  const [loadingCustomers, setLoadingCustomers] = useState<
-    Record<number, boolean>
-  >({});
+  const [customers, setCustomers] = useState<Record<number, CustomerOption[]>>({});
+  const [loadingCustomers, setLoadingCustomers] = useState< Record<number, boolean>>({});
 
   const formik = useFormik<AssignDistributorFormValues>({
     initialValues: {
@@ -94,10 +80,47 @@ const AssignDistributor = () => {
 
   const { values, setFieldValue, handleBlur, touched, errors } = formik;
 
-  const getCustomerType = (assignType: string) => {
-    if (assignType === "0") return "3";
-    if (assignType === "1") return "2";
-    return "4";
+
+    const handleSubmit = (values: AssignDistributorFormValues) => {
+    if (!token) return;
+
+    const lineData = values.slots.map((slot) => {
+      const cleanedCustomers = slot.customers.filter(
+        (c) => c !== undefined && c !== "undefined"
+      );
+      const lineItem: any = {
+        line_id: Number(slot.line_id),
+        assign_type: Number(slot.assign_type),
+        slot_mapping_ids: cleanedCustomers.map(Number),
+      };
+      if (slot.assign_type === "0") {
+        lineItem.from_date = slot.from_date;
+        lineItem.to_date = slot.to_date;
+      }
+      return lineItem;
+    });
+
+    const payload: any = {
+      token,
+      distributor_id: Number(values.distributer_id),
+      slot_id: Number(values.slot_id),
+      line_data: lineData,
+    };
+
+    console.log("Submitting payload:", payload);
+
+    AssignDistributorSlotMap(payload)
+      .then((res) => {
+        if (res.data.status === 1) {
+          toast.success(res.data.msg || "Assignment successful!");
+        } else {
+          toast.error(res.data.msg || "Failed to assign distributor.");
+        }
+      })
+      .catch((error) => {
+        console.error("API error:", error);
+        toast.error("Something went wrong while assigning.");
+      });
   };
 
   useEffect(() => {
@@ -111,6 +134,9 @@ const AssignDistributor = () => {
       );
     }
   }, [values.slots, values.slot_id, token]);
+
+
+
 
   const fetchCustomersForSlots = (
     slots: any[],
@@ -156,47 +182,12 @@ const AssignDistributor = () => {
     });
   };
 
-  const handleSubmit = (values: AssignDistributorFormValues) => {
-    if (!token) return;
-
-    const lineData = values.slots.map((slot) => {
-      const cleanedCustomers = slot.customers.filter(
-        (c) => c !== undefined && c !== "undefined"
-      );
-      const lineItem: any = {
-        line_id: Number(slot.line_id),
-        assign_type: Number(slot.assign_type),
-        slot_mapping_ids: cleanedCustomers.map(Number),
-      };
-      if (slot.assign_type === "0") {
-        lineItem.from_date = slot.from_date;
-        lineItem.to_date = slot.to_date;
-      }
-      return lineItem;
-    });
-
-    const payload: any = {
-      token,
-      distributor_id: Number(values.distributer_id),
-      slot_id: Number(values.slot_id),
-      line_data: lineData,
-    };
-
-    console.log("Submitting payload:", payload);
-
-    AssignDistributorSlotMap(payload)
-      .then((res) => {
-        if (res.data.status === 1) {
-          toast.success(res.data.msg || "Assignment successful!");
-        } else {
-          toast.error(res.data.msg || "Failed to assign distributor.");
-        }
-      })
-      .catch((error) => {
-        console.error("API error:", error);
-        toast.error("Something went wrong while assigning.");
-      });
+    const getCustomerType = (assignType: string) => {
+    if (assignType === "0") return "3";
+    if (assignType === "1") return "2";
+    return "4";
   };
+
 
   return (
     <div className="container my-3">
@@ -263,59 +254,42 @@ const AssignDistributor = () => {
                   </Col>
                 </Row>
 
-                {isTemporary && (
-                  <Row gutter={[16, 16]}>
-                    <Col xs={24} md={12}>
-                      <label>From Date</label>
-                      <DatePicker
-                        style={{ width: "100%" }}
-                        value={
-                          slot.from_date ? dayjs(slot.from_date) : undefined
-                        }
-                        onChange={(date) =>
-                          setFieldValue(
-                            `slots[${idx}].from_date`,
-                            date ? dayjs(date).format("YYYY-MM-DD") : ""
-                          )
-                        }
-                        onBlur={handleBlur}
-                        className={`${
-                          slotErrors.from_date && slotTouched.from_date
-                            ? "is-invalid"
-                            : ""
-                        }`}
-                      />
-                      {slotErrors.from_date && slotTouched.from_date && (
-                        <div className="text-danger">
-                          {slotErrors.from_date}
-                        </div>
-                      )}
-                    </Col>
+{isTemporary && (
+  <Row gutter={[16, 16]}>
+    <Col xs={24} md={12}>
+      <CustomDatePicker
+        label="From Date"
+        value={slot.from_date}
+        onChange={(date) =>
+          setFieldValue(
+            `slots[${idx}].from_date`,
+            date ? dayjs(date).format("YYYY-MM-DD") : ""
+          )
+        }
+        onBlur={handleBlur}
+        error={slotErrors.from_date}
+        touched={slotTouched.from_date}
+      />
+    </Col>
 
-                    <Col xs={24} md={12}>
-                      <label>To Date</label>
-                      <DatePicker
-                        style={{ width: "100%" }}
-                        value={slot.to_date ? dayjs(slot.to_date) : undefined}
-                        onChange={(date) =>
-                          setFieldValue(
-                            `slots[${idx}].to_date`,
-                            date ? dayjs(date).format("YYYY-MM-DD") : ""
-                          )
-                        }
-                        onBlur={handleBlur}
-                        className={`${
-                          slotErrors.to_date && slotTouched.to_date
-                            ? "is-invalid"
-                            : ""
-                        }`}
-                      />
-                      {slotErrors.to_date && slotTouched.to_date && (
-                        <div className="text-danger">{slotErrors.to_date}</div>
-                      )}
-                    </Col>
-                  </Row>
-                )}
+    <Col xs={24} md={12}>
+      <CustomDatePicker
+        label="To Date"
+        value={slot.to_date}
+        onChange={(date) =>
+          setFieldValue(
+            `slots[${idx}].to_date`,
+            date ? dayjs(date).format("YYYY-MM-DD") : ""
+          )
+        }
+        onBlur={handleBlur}
+        error={slotErrors.to_date}
+        touched={slotTouched.to_date}
+      />
+    </Col>
+  </Row>
+)}
+
 
                 {slot.assign_type &&
                   (!isTemporary ||

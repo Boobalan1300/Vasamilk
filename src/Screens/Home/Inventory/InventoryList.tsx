@@ -1,22 +1,19 @@
 
 import { useState, useEffect } from "react";
-import {
-  GetInventoryList,
-  AddInventory as AddInventoryApi,
-} from "../../../Service/ApiServices";
-import { Tag, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useToken } from "../../../Hooks/UserHook";
+import { useLoader } from "../../../Hooks/useLoader";
+import { Images } from "../../../Utils/Images";
+import { GetInventoryList,AddInventory as AddInventoryApi } from "../../../Service/ApiServices";
+import CustomTable from "../../../Components/CustomTable";
+import CustomPagination from "../../../Components/CustomPagination";
+import CustomButton from "../../../Components/Button";
+import FormField from "../../../Components/InputField";
 import UpdateInventoryForm from "../../../Modal/UpdateInventory";
 import AddDistributorLogModal from "../../../Modal/AddDistributorLog";
-import { Images } from "../../../Utils/Images";
-import CustomTable from "../../../Components/CustomTable";
 import type { ColumnsType } from "antd/es/table";
-import CustomPagination from "../../../Components/CustomPagination";
-import { useLoader } from "../../../Hooks/useLoader";
-import FormField from "../../../Components/InputField";
-import { useToken } from "../../../Hooks/UserHook";
-import CustomButton from "../../../Components/Button";
+import { Tag, Tooltip } from "antd";
 
 export interface SlotInventoryItem {
   id: number;
@@ -33,6 +30,9 @@ export interface SlotInventoryItem {
 }
 
 const InventoryList = () => {
+  const navigate = useNavigate();
+  const { showLoader, hideLoader } = useLoader();
+  const token = useToken();
   const [inventoryList, setInventoryList] = useState<any[]>([]);
   const [isUpdateAllowed, setIsUpdateAllowed] = useState(false);
   const [isAddAllowed, setIsAddAllowed] = useState(false);
@@ -40,22 +40,19 @@ const InventoryList = () => {
   const [totalQuantity, setTotalQuantity] = useState("");
   const [comment, setComment] = useState("");
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedInventoryId, setSelectedInventoryId] = useState<number | null>(
-    null
-  );
+  const [selectedInventoryId, setSelectedInventoryId] = useState<number | null>(null);
   const [addLogModalOpen, setAddLogModalOpen] = useState(false);
-  const [selectedInventory, setSelectedInventory] =
-    useState<SlotInventoryItem | null>(null);
-
+  const [selectedInventory, setSelectedInventory] = useState<SlotInventoryItem | null>(null);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
 
-  const navigate = useNavigate();
-  const { showLoader, hideLoader } = useLoader();
-  const token = useToken();
+ 
+  useEffect(() => {
+    fetchInventory();
+  }, [pagination.current, pagination.pageSize]);
 
   const fetchInventory = () => {
     showLoader();
@@ -81,7 +78,6 @@ const InventoryList = () => {
         }
       })
       .catch(() => {
-        // console.error(err);
         toast.error("Something went wrong");
       })
       .finally(() => {
@@ -89,9 +85,6 @@ const InventoryList = () => {
       });
   };
 
-  useEffect(() => {
-    fetchInventory();
-  }, [pagination.current, pagination.pageSize]);
 
   const handleView = (record: any) => {
     navigate(`/listLog?page=${pagination.current}`, {

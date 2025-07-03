@@ -1,14 +1,14 @@
 
 import { useEffect, useState } from "react";
-import { Row, Col } from "antd";
+import { useToken } from "../../../Hooks/UserHook";
 import { GetDailyInventoryReport } from "../../../Service/ApiServices";
-
-import SimpleCard from "../../../Components/SimpleCard";
-import { Images } from "../../../Utils/Images";
 import InventoryChart from "../Charts/InventoryChart";
 import InventoryList from "./InventoryList";
 import DailyMilkReport from "./DailyMilkReport";
-import { useToken } from "../../../Hooks/UserHook";
+import SimpleCard from "../../../Components/SimpleCard";
+import { Images } from "../../../Utils/Images";
+import { Row, Col } from "antd";
+
 
 interface InventoryData {
   eve_slot_count: number;
@@ -19,9 +19,7 @@ interface InventoryData {
 }
 
 const Inventory = () => {
-  const [dailyInventory, setDailyInventory] = useState<InventoryData | null>(
-    null
-  );
+  const [dailyInventory, setDailyInventory] = useState<InventoryData | null>(null);
 
   const token = useToken();
 
@@ -116,7 +114,6 @@ const Inventory = () => {
 
       {/* <VendorMilkReport/> */}
 
-      {/* <SlotMappingList/> */}
     </div>
   );
 };

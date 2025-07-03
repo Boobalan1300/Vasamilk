@@ -6,17 +6,14 @@ import { Input, Row, Col, Typography } from "antd";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import '../../Styles/FromFields.css'
+import "../../Styles/FromFields.css";
 
 import {
   handleVerifyOtp as apiVerifyOtp,
   handleResendOtp as apiResendOtp,
 } from "../../Service/ApiServices";
 
-import {
-  getDecryptedCookie,
-  setEncryptedCookie,
-} from "../../Utils/Cookie";
+import { getDecryptedCookie, setEncryptedCookie } from "../../Utils/Cookie";
 
 import { Images } from "../../Utils/Images";
 import "../../Styles/Common.css";
@@ -45,39 +42,43 @@ const VerifyOtp: React.FC = () => {
     initialValues: { otp: "" },
     validationSchema,
     onSubmit: (values) => {
-      const resetKey = getDecryptedCookie(RESET_KEY_COOKIE);
-
-      if (!resetKey) {
-        toast.error("Reset key not found or invalid. Please try again.");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("otp", values.otp);
-      formData.append("reset_key", resetKey);
-
-      apiVerifyOtp(formData)
-        .then((res) => {
-          const { data } = res;
-          if (data.status === 1) {
-            toast.success("OTP verified successfully!");
-           
-            setEncryptedCookie(RESET_KEY_COOKIE, data.reset_key, 5);
-
-            sessionStorage.setItem("otpVerified", "true");
-            sessionStorage.removeItem("forgotInitiated");
-
-            navigate("/resetPassword");
-          } else {
-            toast.error(data.msg || "OTP verification failed.");
-          }
-        })
-        .catch((err) => {
-          console.error("API error:", err);
-          toast.error("Error verifying OTP. Please try again.");
-        });
+      handleOtpVerification(values.otp);
     },
   });
+
+  const handleOtpVerification = (otp: string) => {
+    const resetKey = getDecryptedCookie(RESET_KEY_COOKIE);
+
+    if (!resetKey) {
+      toast.error("Reset key not found or invalid. Please try again.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("otp", otp);
+    formData.append("reset_key", resetKey);
+
+    apiVerifyOtp(formData)
+      .then((res) => {
+        const { data } = res;
+        if (data.status === 1) {
+          toast.success("OTP verified successfully!");
+
+          setEncryptedCookie(RESET_KEY_COOKIE, data.reset_key, 5);
+
+          sessionStorage.setItem("otpVerified", "true");
+          sessionStorage.removeItem("forgotInitiated");
+
+          navigate("/resetPassword");
+        } else {
+          toast.error(data.msg || "OTP verification failed.");
+        }
+      })
+      .catch((err) => {
+        console.error("API error:", err);
+        toast.error("Error verifying OTP. Please try again.");
+      });
+  };
 
   const { values, errors, touched, handleSubmit, setFieldValue } = formik;
 
@@ -174,7 +175,7 @@ const VerifyOtp: React.FC = () => {
                     {resendLoading ? "Resending..." : "Resend OTP"}
                   </span>
                 </div>
-                <CustomButton className="mt-3  w-100 AuthButton"  type="submit">
+                <CustomButton className="mt-3  w-100 AuthButton" type="submit">
                   Verify OTP
                 </CustomButton>
               </div>

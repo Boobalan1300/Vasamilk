@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { Tag } from "antd";
-import { GetDistributorLines } from "../../../Service/ApiServices";
-import { useNavigate } from "react-router-dom";
-import CustomTable from "../../../Components/CustomTable";
-import type { ColumnsType } from "antd/es/table";
-import { useLoader } from "../../../Hooks/useLoader";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { GetDistributorLines } from "../../../Service/ApiServices";
+import { useLoader } from "../../../Hooks/useLoader";
 import { useToken } from "../../../Hooks/UserHook";
+import CustomTable from "../../../Components/CustomTable";
 import CustomButton from "../../../Components/Button";
+import type { ColumnsType } from "antd/es/table";
+import { Tag } from "antd";
 
 interface LineData {
   id: number;

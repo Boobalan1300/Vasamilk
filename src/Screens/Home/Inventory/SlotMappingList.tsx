@@ -3,13 +3,13 @@
 
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useToken } from "../../../Hooks/UserHook";
+import { GetSlotMapping } from "../../../Service/ApiServices";
 import CustomTable from "../../../Components/CustomTable";
 import CustomPagination from "../../../Components/CustomPagination";
-import { GetSlotMapping } from "../../../Service/ApiServices";
-import type { ColumnsType } from "antd/es/table";
-import { useToken } from "../../../Hooks/UserHook";
-import { toast } from "react-toastify";
 import CustomButton from "../../../Components/Button";
+import type { ColumnsType } from "antd/es/table";
 
 interface SlotMappingRecord {
   slot_log_id: number;
@@ -33,30 +33,15 @@ interface SlotMappingRecord {
 }
 
 const SlotMappingList = () => {
-  const [data, setData] = useState<SlotMappingRecord[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const token = useToken();
   const navigate = useNavigate();
   const location = useLocation();
-  
+  const [data, setData] = useState<SlotMappingRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 }); 
   const { slotId, givenType } = location.state || {};
 
 
-  const getTitle = () => {
-    let slotLabel = "";
-    let whoLabel = "";
-
-    if (slotId === 1) slotLabel = "Morning";
-    else if (slotId === 2) slotLabel = "Evening";
-    else slotLabel = "Unknown Slot";
-
-    if (givenType === 1) whoLabel = "Vendor";
-    else if (givenType === 2) whoLabel = "Distributor";
-    else whoLabel = "Unknown";
-
-    return `${slotLabel} - ${whoLabel} Slot Mappings`;
-  };
 
   useEffect(() => {
     if (token) fetchData(token, pagination.current, pagination.pageSize);
@@ -87,6 +72,22 @@ const SlotMappingList = () => {
   const handlePageChange = (page: number, pageSize: number) => {
     setPagination((prev) => ({ ...prev, current: page, pageSize }));
   };
+
+    const getTitle = () => {
+    let slotLabel = "";
+    let whoLabel = "";
+
+    if (slotId === 1) slotLabel = "Morning";
+    else if (slotId === 2) slotLabel = "Evening";
+    else slotLabel = "Unknown Slot";
+
+    if (givenType === 1) whoLabel = "Vendor";
+    else if (givenType === 2) whoLabel = "Distributor";
+    else whoLabel = "Unknown";
+
+    return `${slotLabel} - ${whoLabel} Slot Mappings`;
+  };
+
 
   const columns: ColumnsType<SlotMappingRecord> = [
     {

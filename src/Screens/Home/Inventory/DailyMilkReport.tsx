@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Card, Tag, Spin, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { GetMilkDailyReport } from "../../../Service/ApiServices";
 import { useToken } from "../../../Hooks/UserHook";
-import { toast } from "react-toastify";
 import CustomButton from "../../../Components/Button";
+import { Card, Tag, Spin, Row, Col } from "antd";
 
 const DailyMilkReport = () => {
   const [inData, setInData] = useState<{ [slotId: number]: number }>({});
