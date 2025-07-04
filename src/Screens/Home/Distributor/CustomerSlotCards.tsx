@@ -79,7 +79,15 @@ const CustomerSlotCards: React.FC = () => {
 
   return (
     <div>
-      <Card className="my-4">
+<Card
+  className="my-4"
+  // style={{
+  //   position: "sticky",
+  //   top: 0,          
+  //   zIndex: 1000,     
+  //   backgroundColor: "#fff", 
+  // }}
+>
         <Row justify="space-between" align="middle" className="">
           <Col>
             <h5 className="mb-2">Select Slot</h5>
@@ -110,7 +118,17 @@ const CustomerSlotCards: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col xs={24}>
-          <Card title="Given / Upcoming / Partially Given" className="mb-4">
+          <Card
+            title="Given / Upcoming / Partially Given"
+            className="mb-4"
+            styles={{
+              header: {
+                backgroundColor: slotId === 1 ? "#e6f7ff" : "#fff7e6",
+                color: "#000",
+                fontWeight: 600,
+              },
+            }}
+          >
             <Row gutter={[16, 16]}>
               {givenData.length > 0 ? (
                 givenData.map((item) => (
@@ -118,7 +136,7 @@ const CustomerSlotCards: React.FC = () => {
                     <Card
                       size="small"
                       className="shadow-sm border-0 rounded-3 h-100"
-                      style={{backgroundColor:""}}
+                      style={{ backgroundColor: "" }}
                     >
                       <div className="d-flex flex-column gap-2">
                         <h6 className="mb-0 fw-semibold text-grey">
@@ -136,9 +154,7 @@ const CustomerSlotCards: React.FC = () => {
                         </div>
 
                         <div className="d-flex justify-content-between small">
-                          <span className="fw-semibold ">
-                            Status:
-                          </span>
+                          <span className="fw-semibold ">Status:</span>
                           <span
                             className={`fw-semibold ${
                               item.milk_given_status === "Given"
@@ -163,7 +179,16 @@ const CustomerSlotCards: React.FC = () => {
             </Row>
           </Card>
 
-          <Card title="Cancelled">
+          <Card
+            title="Cancelled"
+            styles={{
+              header: {
+                backgroundColor: slotId === 1 ? "#e6f7ff" : "#fff7e6",
+                color: "#000",
+                fontWeight: 600,
+              },
+            }}
+          >
             {cancelledData.length > 0 ? (
               cancelledData.map((item) => (
                 <div key={item.slot_log_id} className="border-bottom py-2">
@@ -177,6 +202,10 @@ const CustomerSlotCards: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      <div style={{height:"1000px"}}>
+        klnasd
+      </div>
     </div>
   );
 };

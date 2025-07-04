@@ -25,6 +25,11 @@ const DistributorDashboard: React.FC = () => {
   const disabledDate = (current: Dayjs) =>
     current && current > TODAY.endOf("day");
 
+  const currentYear = TODAY.year();
+  const startYear = currentYear - 4;
+  const start = TODAY.set("year", startYear).startOf("year");
+  const end = TODAY.endOf("month");
+
   const fetchData = (date: Dayjs) => {
     if (!token) return;
     showLoader();
@@ -76,7 +81,6 @@ const DistributorDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    
     fetchData(selectedDate);
   }, [selectedDate]);
 
@@ -89,17 +93,19 @@ const DistributorDashboard: React.FC = () => {
               disabledDate={disabledDate}
               value={selectedDate}
               onChange={(date) => date && setSelectedDate(date)}
+              validRange={[start, end]}
+              headerMode="custom"
             />
           </Card>
         </Col>
 
         <Col xs={24} md={12}>
-          <h4 className="mb-3">
+          <p className="mb-3 fs-10 ">
             Selected Date:{" "}
             <span className="text-grey">
               {selectedDate.format("DD MMM YYYY")}
             </span>
-          </h4>
+          </p>
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12}>
               <Card className="h-100">
@@ -167,8 +173,7 @@ const DistributorDashboard: React.FC = () => {
         </Col>
       </Row>
 
-      <CustomerSlotCards  />
-
+      <CustomerSlotCards />
     </div>
   );
 };
