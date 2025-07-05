@@ -172,3 +172,89 @@ export const GetReportByDate =(formData:FormData)=>{
 // fetchLinesDropDown  - /milk-api/drop-down/lines-drop-down
 
 // GetSlotMapping  - /milk-api/milk-sales/list-slot-mapping
+
+
+
+// ---------   Masters   ------------
+
+export const GetSlotList=(formData:FormData,page=1,size=10)=>{
+  return axios.post(`/milk-api/masters/list-slot?page=${page}&size=${size}`,formData)
+}
+  
+export const UpdateSlot=(formData:FormData)=>{
+  return axios.post(`/milk-api/masters/update-slot`,formData)
+}
+
+
+
+//lines
+
+export const GetLinesList=(formData:FormData,page=1,size=10)=>{
+  return axios.post(`/milk-api/masters/list-lines?page=${page}&size=${size}`,formData)
+}
+
+
+export const CreateLine = (formData: FormData) => {
+  return axios.post("/milk-api/masters/create-lines", formData);
+};
+
+export const UpdateLine = (formData: FormData) => {
+  return axios.post("/milk-api/masters/update-lines", formData);
+};
+
+export const DeleteLine = (formData: FormData) => {
+  return axios.post("/milk-api/masters/delete-lines", formData);
+};
+
+export const ToggleLineStatus = (formData: FormData) => {
+  return axios.post("/milk-api/masters/inactive-lines", formData);
+};
+
+
+// PRice
+
+
+
+export const GetPriceTagsList = (formData: FormData, page = 1, size = 10) => {
+  return axios.post(`/milk-api/masters/list-price-tag?page=${page}&size=${size}`, formData);
+};
+
+export const CreatePriceTag = (formData: FormData) => {
+  return axios.post(`/milk-api/masters/create-price-tag`, formData);
+};
+
+export const UpdatePriceTag = (formData: FormData) => {
+  return axios.post(`/milk-api/masters/update-price-tag`, formData);
+};
+
+export const DeletePriceTag = (formData: FormData) => {
+  return axios.post(`/milk-api/masters/delete-price-tag`, formData);
+};
+
+export const TogglePriceTagStatus = (data: FormData) => {
+  return axios.post("/milk-api/masters/inactive-price-tag", data);
+};
+
+
+// Reason
+
+export const GetReasonList = (formData: FormData, page = 1, size = 10) => {
+  return axios.post(`/milk-api/masters/list-reason?page=${page}&size=${size}`, formData);
+};
+
+export const CreateReason = (formData: FormData) => {
+  return axios.post(`/milk-api/masters/create-reason`, formData);
+};
+
+export const UpdateReason = (formData: FormData) => {
+  return axios.post(`/milk-api/masters/update-reason`, formData);
+};
+
+export const DeleteReason = (formData: FormData) => {
+  return axios.post(`/milk-api/masters/delete-reason`, formData);
+};
+
+export const ToggleReasonStatus = (formData: FormData) => {
+  return axios.post("/milk-api/masters/inactive-reason", formData);
+};
+

@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Images } from "../Utils/Images";
@@ -83,26 +81,61 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
             label: "Users",
             onClick: () => navigate("/userManagement"),
           },
+          {
+            key: "masters",
+            icon: (
+              <span className="iconWrapper">
+                <img
+                  src={Images.dashboard}
+                  alt="Masters"
+                  className="iconStyle"
+                />
+              </span>
+            ),
+            label: "Masters",
+            children: [
+              {
+                key: "masters-slot",
+                label: "Slot",
+                onClick: () => navigate("/masters/userManagement"),
+              },
+              {
+                key: "masters-lines",
+                label: "Lines",
+                onClick: () => navigate("/masters/linesManagement"),
+              },
+              {
+                key: "masters-price",
+                label: "Price",
+                onClick: () => navigate("/masters/priceManagement"),
+              },
+              {
+                key: "masters-reason",
+                label: "Reason",
+                onClick: () => navigate("/masters/reasonManagement"),
+              },
+            ],
+          },
         ]
       : []),
-      ...(userType === 4
-  ? [
-      {
-        key: "4",
-        icon: (
-          <span className="iconWrapper">
-            <img
-              src={Images.distributor}
-              alt="Distributor Dashboard"
-              className="iconStyle"
-            />
-          </span>
-        ),
-        label: " Dashboard",
-        onClick: () => navigate("/distributorDashboard"),
-      },
-    ]
-  : []),
+    ...(userType === 4
+      ? [
+          {
+            key: "4",
+            icon: (
+              <span className="iconWrapper">
+                <img
+                  src={Images.distributor}
+                  alt="Distributor Dashboard"
+                  className="iconStyle"
+                />
+              </span>
+            ),
+            label: " Dashboard",
+            onClick: () => navigate("/distributorDashboard"),
+          },
+        ]
+      : []),
 
     {
       key: "5",

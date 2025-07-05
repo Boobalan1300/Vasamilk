@@ -1,4 +1,3 @@
-
 import CreateUser from "../Screens/Home/User/CreateUser";
 import UserList from "../Screens/Home/User/UserList";
 import Inventory from "../Screens/Home/Inventory/Inventory";
@@ -11,6 +10,10 @@ import DistributorList from "../Screens/Home/Distributor/DistributorList";
 import AssignedSlot from "../Screens/Home/Distributor/AssignedSlot";
 import AssignDistributor from "../Screens/Home/Distributor/AssignDistributor";
 import DistributorDashboard from "../Screens/Home/Distributor/DistributorDashboard";
+import SlotManagement from "../Screens/Home/Masters/SlotManagement";
+import LinesManagement from "../Screens/Home/Masters/LinesManagement";
+import PriceManagement from "../Screens/Home/Masters/PriceManagement";
+import ReasonManagement from "../Screens/Home/Masters/ReasonManagement";
 
 export const HomeRouter = [
   {
@@ -23,22 +26,30 @@ export const HomeRouter = [
           { path: "/createUser", element: <CreateUser /> },
           { path: "/editUser", element: <CreateUser /> },
           { path: "/inventory", element: <Inventory /> },
-           {path:"/listslotMap",element:<SlotMappingList/>},
-          {path: "/listLog", element: <ListLog /> },
-            
-          {path:"/distributorList",element:<DistributorList/>},
-           {path:"assignedSlots",element:<AssignedSlot/>},
+          { path: "/listslotMap", element: <SlotMappingList /> },
+          { path: "/listLog", element: <ListLog /> },
 
-           {path:"assignDistributor",element:<AssignDistributor/>},
-         
+          { path: "/distributorList", element: <DistributorList /> },
+          { path: "assignedSlots", element: <AssignedSlot /> },
+
+          { path: "assignDistributor", element: <AssignDistributor /> },
+
+          // Masters
+
+          { path: "/masters/userManagement", element: <SlotManagement /> },
+          { path: "/masters/linesManagement", element: <LinesManagement /> },
+          { path: "/masters/priceManagement", element: <PriceManagement /> },
+          { path: "/masters/reasonManagement", element: <ReasonManagement /> },
+
+
+
         ],
       },
 
       {
         element: <PrivateRoute allowedUserTypes={[4]} />,
         children: [
-              { path: "/distributorDashboard", element: <DistributorDashboard /> },
-
+          { path: "/distributorDashboard", element: <DistributorDashboard /> },
         ],
       },
     ],

@@ -57,7 +57,6 @@ const assignDistributorSchema = Yup.object().shape({
   ),
 });
 
-
 const AssignDistributor = () => {
   const token = useToken();
   const [customers, setCustomers] = useState<Record<number, CustomerOption[]>>(
@@ -225,17 +224,18 @@ const AssignDistributor = () => {
 
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <div className="fw-bold fs-5">Assignment Details</div>
-                  <CustomButton
-                    className="btn-error btn-sm px-2 py-1"
-                    disabled={values.slots.length === 1}
-                    onClick={() => {
-                      const updatedSlots = [...values.slots];
-                      updatedSlots.splice(idx, 1);
-                      setFieldValue("slots", updatedSlots);
-                    }}
-                  >
-                    Remove
-                  </CustomButton>
+                  {values.slots.length >= 2 && (
+                    <CustomButton
+                      className="btn-error btn-sm px-2 py-1"
+                      onClick={() => {
+                        const updatedSlots = [...values.slots];
+                        updatedSlots.splice(idx, 1);
+                        setFieldValue("slots", updatedSlots);
+                      }}
+                    >
+                      Remove
+                    </CustomButton>
+                  )}
                 </div>
 
                 <Row gutter={[16, 16]}>
