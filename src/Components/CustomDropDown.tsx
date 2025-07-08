@@ -72,7 +72,7 @@ const CustomDropDown: React.FC<ReusableDropdownsProps> = ({
   const [loadingDistributors, setLoadingDistributors] = useState(false);
   const [loadingCustomers, setLoadingCustomers] = useState(false);
 
-  const { values, setFieldValue, handleBlur, touched, errors } = formik;
+  const { values, setFieldValue, touched, errors } = formik;
 
   useEffect(() => {
     if (!token) return;
