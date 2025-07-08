@@ -14,6 +14,8 @@ import SlotManagement from "../Screens/Home/Masters/SlotManagement";
 import LinesManagement from "../Screens/Home/Masters/LinesManagement";
 import PriceManagement from "../Screens/Home/Masters/PriceManagement";
 import ReasonManagement from "../Screens/Home/Masters/ReasonManagement";
+import PlaceDirectOrder from "../Screens/Home/Orders/PlaceDirectOrder";
+import Sales from "../Screens/Home/Sales/Sales";
 
 export const HomeRouter = [
   {
@@ -34,15 +36,21 @@ export const HomeRouter = [
 
           { path: "assignDistributor", element: <AssignDistributor /> },
 
+          // Sales
+           { path: "/sales", element: <Sales /> },
+
+
+
           // Masters
 
-          { path: "/masters/userManagement", element: <SlotManagement /> },
+          { path: "/masters/slotManagement", element: <SlotManagement /> },
           { path: "/masters/linesManagement", element: <LinesManagement /> },
           { path: "/masters/priceManagement", element: <PriceManagement /> },
           { path: "/masters/reasonManagement", element: <ReasonManagement /> },
 
+          // Orders
 
-
+          { path:"/placeOrder",element:<PlaceDirectOrder/> }
         ],
       },
 

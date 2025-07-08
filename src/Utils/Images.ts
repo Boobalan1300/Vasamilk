@@ -7,6 +7,8 @@ import edit from "../assets/Icons/Png/edit.png"
 import trash from "../assets/Icons/Png/trash.png"
 import add from "../assets/Icons/Png/add.png"
 import distributor from "../assets/Icons/Png/distributor.png"
+import sales from "../assets/Icons/Png/sales.png"
+import placeOrder from "../assets/Icons/Png/placeOrder.png"
 
 import milkBottle from "../assets/Icons/Png/milkBottle.png"
 import morning from "../assets/Icons/Png/morning.png"
@@ -18,6 +20,7 @@ import milk1 from "../assets/Images/Png/milk1.jpg"
 import milk2 from "../assets/Images/Png/milk2.jpg"
 import milk3 from "../assets/Images/Png/milk3.jpg"
 import logo from "../assets/Images/Png/Logo.png"
+import QRcode from "../assets/Images/Png/QRcode.png"
 
 
 export const Images = {
@@ -26,6 +29,8 @@ export const Images = {
     inventory,
     distributor,
     logout,
+    sales,
+    placeOrder,
    
     milkBottle,
     morning,
@@ -39,5 +44,6 @@ export const Images = {
     milk2,
     milk3,
     logo,
+    QRcode,
 
 }

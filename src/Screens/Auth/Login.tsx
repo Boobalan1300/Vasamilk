@@ -34,15 +34,14 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-  clearForgotPasswordSession();
-}, []);
+    clearForgotPasswordSession();
+  }, []);
 
-
-const clearForgotPasswordSession = () => {
-  sessionStorage.removeItem("forgotInitiated");
-  sessionStorage.removeItem("otpVerified");
-  sessionStorage.removeItem("resetReached");
-};
+  const clearForgotPasswordSession = () => {
+    sessionStorage.removeItem("forgotInitiated");
+    sessionStorage.removeItem("otpVerified");
+    sessionStorage.removeItem("resetReached");
+  };
 
   const handleLoginSubmit = (values: LoginFormType) => {
     const auth_code = sha1(SALT_KEY + values.userName);
@@ -56,7 +55,6 @@ const clearForgotPasswordSession = () => {
     handleLogin(formData)
       .then((response) => {
         const { data } = response;
-        console.log(data)
 
         if (data.status === 1) {
           toast.success("Login successful!");
@@ -69,8 +67,16 @@ const clearForgotPasswordSession = () => {
           };
 
           setEncryptedCookie("user_data", authData, 120);
-
           navigate("/inventory");
+        } else if (data.status === 2) {
+          sessionStorage.setItem("forgotInitiated", "true");
+          sessionStorage.setItem("otpUser", values.userName);
+          setEncryptedCookie("reset_key", data.reset_key);
+
+          navigate("/reset-password");
+          toast.info("OTP has been sent. Please reset your password.");
+
+          navigate("/verify-otp");
         } else {
           toast.error(data.msg || "Login failed.");
         }
@@ -150,7 +156,7 @@ const clearForgotPasswordSession = () => {
                 </span>
               </div>
 
-              <CustomButton type="submit"  className="mt-3 w-100 AuthButton">
+              <CustomButton type="submit" className="mt-3 w-100 AuthButton">
                 Sign In
               </CustomButton>
             </form>

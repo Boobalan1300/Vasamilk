@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Layout, Menu, Drawer, Button, Grid, message } from "antd";
+import { RightOutlined, LeftOutlined, MenuOutlined } from "@ant-design/icons";
+
 import { Images } from "../Utils/Images";
 import { handleLogout } from "../Service/ApiServices";
 import { useUserType, useToken } from "../Hooks/UserHook";
 import { clearCookie } from "../Utils/Cookie";
-import { RightOutlined, LeftOutlined } from "@ant-design/icons";
 import CustomButton from "../Components/Button";
-import { Layout, Menu, message } from "antd";
+
 import "../Styles/Common.css";
+
 const { Sider } = Layout;
+const { useBreakpoint } = Grid;
 
 type SideBarProps = {
   collapsed: boolean;
@@ -17,8 +21,11 @@ type SideBarProps = {
 
 const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
   const navigate = useNavigate();
-  const userType = useUserType();
   const token = useToken();
+  const userType = useUserType();
+  const screens = useBreakpoint();
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   const logoutUser = () => {
     if (!token) {
@@ -34,8 +41,7 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
         clearCookie("user_data");
         navigate("/login");
       })
-      .catch((error) => {
-        console.error("Logout failed", error);
+      .catch(() => {
         message.error("Logout failed. Please try again.");
       });
   };
@@ -46,13 +52,11 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
           {
             key: "1",
             icon: (
-              <span className="iconWrapper">
-                <img
-                  src={Images.inventory}
-                  alt="inventory"
-                  className="iconStyle"
-                />
-              </span>
+              <img
+                src={Images.inventory}
+                className="iconStyle"
+                alt="inventory"
+              />
             ),
             label: "Inventory",
             onClick: () => navigate("/inventory"),
@@ -60,44 +64,33 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
           {
             key: "2",
             icon: (
-              <span className="iconWrapper">
-                <img
-                  src={Images.distributor}
-                  alt="Distributor"
-                  className="iconStyle"
-                />
-              </span>
+              <img
+                src={Images.distributor}
+                className="iconStyle"
+                alt="distributor"
+              />
             ),
             label: "Distributor",
             onClick: () => navigate("/distributorList"),
           },
+          
           {
             key: "3",
-            icon: (
-              <span className="iconWrapper">
-                <img src={Images.user} alt="users" className="iconStyle" />
-              </span>
-            ),
+            icon: <img src={Images.user} className="iconStyle" alt="users" />,
             label: "Users",
             onClick: () => navigate("/userManagement"),
           },
           {
             key: "masters",
             icon: (
-              <span className="iconWrapper">
-                <img
-                  src={Images.dashboard}
-                  alt="Masters"
-                  className="iconStyle"
-                />
-              </span>
+              <img src={Images.dashboard} className="iconStyle" alt="masters" />
             ),
             label: "Masters",
             children: [
               {
                 key: "masters-slot",
                 label: "Slot",
-                onClick: () => navigate("/masters/userManagement"),
+                onClick: () => navigate("/masters/slotManagement"),
               },
               {
                 key: "masters-lines",
@@ -116,6 +109,26 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
               },
             ],
           },
+           {
+            key: "sales",
+            icon: (
+              <img
+                src={Images.sales}
+                className="iconStyle"
+                alt="sales"
+              />
+            ),
+            label: "Sales",
+            onClick: () => navigate("/sales"),
+          },
+          {
+            key: "place-order",
+            icon: (
+              <img src={Images.placeOrder} className="iconStyle" alt="place order" />
+            ),
+            label: "Place Order",
+            onClick: () => navigate("/placeOrder"),
+          },
         ]
       : []),
     ...(userType === 4
@@ -123,41 +136,65 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
           {
             key: "4",
             icon: (
-              <span className="iconWrapper">
-                <img
-                  src={Images.distributor}
-                  alt="Distributor Dashboard"
-                  className="iconStyle"
-                />
-              </span>
+              <img
+                src={Images.distributor}
+                className="iconStyle"
+                alt="dashboard"
+              />
             ),
-            label: " Dashboard",
+            label: "Dashboard",
             onClick: () => navigate("/distributorDashboard"),
           },
         ]
       : []),
-
     {
-      key: "5",
-      icon: (
-        <span className="iconWrapper">
-          <img src={Images.logout} alt="Logout" className="iconStyle" />
-        </span>
-      ),
+      key: "logout",
+      icon: <img src={Images.logout} className="iconStyle" alt="logout" />,
       label: "Logout",
       onClick: logoutUser,
     },
   ];
 
+  const MenuComponent = (
+    <Menu
+      theme="dark"
+      mode="inline"
+      defaultSelectedKeys={["1"]}
+      items={menuItems}
+    />
+  );
+
+  if (!screens.sm) {
+    return (
+      <>
+        <Button
+          icon={<MenuOutlined />}
+          onClick={() => setDrawerVisible(true)}
+          style={{ margin: 10 }}
+        />
+        <Drawer
+          title="Menu"
+          placement="right"
+          closable
+          onClose={() => setDrawerVisible(false)}
+          open={drawerVisible}
+          bodyStyle={{ padding: 0 }}
+        >
+          {MenuComponent}
+        </Drawer>
+      </>
+    );
+  }
+
   return (
     <Sider
-      className="custom-sider"
       collapsed={collapsed}
       width={200}
       style={{
         padding: "10px",
         height: "100vh",
       }}
+      className="custom-sider"
     >
       <div
         style={{
@@ -167,16 +204,9 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
           justifyContent: "space-between",
         }}
       >
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["1"]}
-          items={menuItems}
-        />
-
+        {MenuComponent}
         <CustomButton
           onClick={onToggle}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className="btn btn-link text-white w-100 p-2 text-center"
           style={{
             border: "none",

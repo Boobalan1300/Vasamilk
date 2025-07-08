@@ -99,6 +99,8 @@ export const GetMilkDailyReport = (formData: FormData) => {
   return axios.post("/milk-api/dashboard/daily-milk-required-report", formData);
 };
 
+
+// not used
 export const GetVendorMilkReport = (formData: FormData) => {
   return axios.post("/milk-api/dashboard/vendor-milk-report", formData);
 };
@@ -107,15 +109,6 @@ export const GetVendorMilkReport = (formData: FormData) => {
 export const GetDistributorLines =(formData:FormData)=>{
     return axios.post("/milk-api/slot-assign/get-distributer-line", formData);
 }
-
-
-//not used
-export const GetDistributorInventoryLog = ( page=1, size=50,formData: FormData) => {
-  return axios.post(
-    `/milk-api/milk-sales/list-distributor-log?page=${page}&size=${size}`,
-    formData
-  );
-};
 
 
 
@@ -257,4 +250,35 @@ export const DeleteReason = (formData: FormData) => {
 export const ToggleReasonStatus = (formData: FormData) => {
   return axios.post("/milk-api/masters/inactive-reason", formData);
 };
+
+
+// -------------------------- place Order ------------------------------------
+
+// GetCustomers  - for dropdown
+
+export const getActiveSlot = (formData: FormData) =>{
+  return axios.post("/milk-api/masters/get-active-slot", formData);
+}
+
+
+export const placeDirectCustomerLog = (payload: any) => {
+  return axios.post("/milk-api/milk-sales/direct-customer-log", payload);
+};
+
+
+
+
+
+// -------------------------- sales ------------------------------------
+
+// GetVendorMilkReport
+
+export const GetDistributorInventoryLog = ( page=1, size=50,formData: FormData) => {
+  return axios.post(
+    `/milk-api/milk-sales/list-distributor-log?page=${page}&size=${size}`,
+    formData
+  );
+};
+
+
 

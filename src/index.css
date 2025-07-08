@@ -101,9 +101,9 @@ h1,p,div {
 
 /* circle */
 .ant-pagination-item {
-  width: 36px !important;
-  height: 36px !important;
-  line-height: 34px !important;
+  width: 10px !important;
+  height: 30px !important;
+  /* line-height: 34px !important; */
   text-align: center;
   display: inline-flex;
   justify-content: center;

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Select, message } from "antd";
 import {
@@ -15,6 +14,8 @@ interface ReusableDropdownsProps {
   dropdownKeys: string[];
   formik: any;
   className?: string;
+  customerType?: "1" | "2" | "3" | "4";
+  onCustomersLoaded?: (customers: any[]) => void; 
 }
 
 const UserDropDown = [
@@ -24,14 +25,14 @@ const UserDropDown = [
   { label: "Customer", value: "5" },
 ];
 
-const CustomerType = [
-  { label: "Regular", value: "1" },
-  { label: "Occasional", value: "2" },
+export const CustomerType = [
+  { label: "Regular", value: 1 },
+  { label: "Occasional", value: 2 },
 ];
 
-const PayTypesOptions = [
-  { label: "Daily", value: "1" },
-  { label: "Monthly", value: "2" },
+export const PayTypesOptions = [
+  { label: "Daily", value: 1 },
+  { label: "Monthly", value: 2 },
 ];
 
 const StatusOptions = [
@@ -58,6 +59,8 @@ const CustomDropDown: React.FC<ReusableDropdownsProps> = ({
   dropdownKeys,
   formik,
   className = "col-12 col-md-6 col-lg-2 mb-3",
+  customerType,
+  onCustomersLoaded,
 }) => {
   const token = useToken();
   const [linesList, setLinesList] = useState<any[]>([]);
@@ -136,19 +139,23 @@ const CustomDropDown: React.FC<ReusableDropdownsProps> = ({
     const formData = new FormData();
     formData.append("token", token);
 
+    if (customerType) formData.append("type", customerType);
+
     GetCustomers(formData)
       .then((res) => {
-        console.log("Fetched customers:", res.data); // 👈 log response
         if (res.data.status === 1) {
           setCustomersList(res.data.data || []);
+          onCustomersLoaded?.(res.data.data || []); 
         } else {
           message.error(res.data.msg || "Failed to fetch customers.");
           setCustomersList([]);
+          onCustomersLoaded?.([]);
         }
       })
       .catch(() => {
         message.error("Error fetching customers.");
         setCustomersList([]);
+        onCustomersLoaded?.([]);
       })
       .finally(() => setLoadingCustomers(false));
   };
@@ -169,18 +176,32 @@ const CustomDropDown: React.FC<ReusableDropdownsProps> = ({
         placeholder={`Select ${placeholder.toLowerCase()}`}
         loading={loading}
         onChange={(val) => setFieldValue(name, val ?? "")}
-        onBlur={() => handleBlur({ target: { name } })}
+        // onBlur={() => handleBlur({ target: { name } })}
+        onBlur={() => formik?.handleBlur?.({ target: { name } })}
+
         showSearch
-        filterOption={(input, option) => {
-          const label = option?.children?.toString().toLowerCase() || "";
-          return label.includes(input.toLowerCase());
-        }}
+        optionFilterProp="children"
+        filterOption={(input, option) =>
+          (option?.children as unknown as string)
+            .toLowerCase()
+            .includes(input.toLowerCase())
+        }
       >
-        {options.map((opt) => (
-          <Option key={opt.value} value={opt.value}>
-            {opt.label}
-          </Option>
-        ))}
+        {options
+          .filter(
+            (opt, idx, self) =>
+              opt.value !== undefined &&
+              idx ===
+                self.findIndex((o) => String(o.value) === String(opt.value))
+          )
+          .map((opt, idx) => (
+            <Option
+              key={String(opt.value ?? `${name}-${idx}`)}
+              value={opt.value ?? `${name}-${idx}`}
+            >
+              {opt.label}
+            </Option>
+          ))}
       </Select>
       {errors[name] && touched[name] && typeof errors[name] === "string" && (
         <div className="text-danger">{errors[name]}</div>
@@ -198,23 +219,31 @@ const CustomDropDown: React.FC<ReusableDropdownsProps> = ({
         renderSelect(
           "line_id",
           "Line",
-          linesList.map((l) => ({ label: l.line_name, value: l.id })),
+          linesList.map((l, idx) => ({
+            label: l.line_name || `Line ${idx + 1}`,
+            value: l.id ?? `line-${idx + 1}`,
+          })),
           loadingLines
         )}
       {dropdownKeys.includes("price_tag_id") &&
         renderSelect(
           "price_tag_id",
           "Price Tag",
-          priceTagList.map((p) => ({ label: p.price_tag_name, value: p.id })),
+          priceTagList.map((p, idx) => ({
+            label: p.price_tag_name || `Price Tag ${idx + 1}`,
+            value: p.id ?? `price-${idx + 1}`,
+          })),
           loadingPriceTags
         )}
       {dropdownKeys.includes("distributer_id") &&
         renderSelect(
           "distributer_id",
           "Distributor",
-          distributorsList.map((d) => ({
+          distributorsList.map((d, idx) => ({
             label: `${d.distributer_name} - ${d.phone_number}`,
-            value: String(d.distributer_id),
+            value: d.distributer_id
+              ? String(d.distributer_id)
+              : `distributor-${idx + 1}`,
           })),
           loadingDistributors
         )}
@@ -234,7 +263,7 @@ const CustomDropDown: React.FC<ReusableDropdownsProps> = ({
           "Customers",
           customersList.map((c) => ({
             label: c.name,
-            value: String(c.id),
+            value: String(c.user_id),
           })),
           loadingCustomers
         )}
