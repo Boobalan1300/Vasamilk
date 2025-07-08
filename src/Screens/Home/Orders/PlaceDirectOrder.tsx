@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -25,6 +27,16 @@ const paymentTypes = [
   { label: "Online", value: "online" },
 ];
 
+const directOrderValidationSchema = Yup.object({
+  customers: Yup.string().required("Customer is required"),
+  transactionId: Yup.string().when("paymentType", {
+    is: "online",
+    then: (schema) => schema.required("Transaction ID is required"),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+});
+
+
 const PlaceDirectOrder: React.FC = () => {
   const token = useToken();
   const navigate = useNavigate();
@@ -43,7 +55,6 @@ const PlaceDirectOrder: React.FC = () => {
     handleBlur,
     errors,
     touched,
-    resetForm,
   } = useFormik({
     initialValues: {
       customers: "",
@@ -52,34 +63,46 @@ const PlaceDirectOrder: React.FC = () => {
       transactionId: "",
       paymentType: "cash",
     },
-    validationSchema: Yup.object({
-      customers: Yup.string().required("Customer is required"),
-      transactionId: Yup.string().when("paymentType", {
-        is: "online",
-        then: (schema) => schema.required("Transaction ID is required"),
-        otherwise: (schema) => schema.notRequired(),
-      }),
-    }),
-    onSubmit: async (values, { setSubmitting }) => {
-      if (!token || !userDetails || !activeSlot?.id) return;
+     validationSchema: directOrderValidationSchema,
+    onSubmit: (values, { setSubmitting, resetForm }) => {
+      handlePlaceOrder(
+        values,
+        resetForm,
+        setUserDetails,
+        setSubmitting,
+      );
+    },
+  });
 
-      const quantity =
-        (activeSlot.id === 1
-          ? Number(values.morningQuantity)
-          : Number(values.eveningQuantity)) || 0;
+  const handlePlaceOrder = (
+    values: any,
 
-      const payload = {
-        token,
-        customer_id: userDetails.user_id,
-        quantity,
-        is_paid: 1,
-        payment_type: values.paymentType === "cash" ? 1 : 2,
-        transaction_id: values.transactionId || "",
-      };
+    
+    resetForm: () => void,
+    setUserDetails: (val: any) => void,
+    setSubmitting: (val: boolean) => void,
+   
+  ) => {
+    if (!token || !userDetails || !activeSlot?.id) return;
 
-      showLoader();
-      try {
-        const res = await placeDirectCustomerLog(payload);
+    const quantity =
+      (activeSlot.id === 1
+        ? Number(values.morningQuantity)
+        : Number(values.eveningQuantity)) || 0;
+
+    const payload = {
+      token,
+      customer_id: userDetails.user_id,
+      quantity,
+      is_paid: 1,
+      payment_type: values.paymentType === "cash" ? 1 : 2,
+      transaction_id: values.transactionId || "",
+    };
+
+    showLoader();
+
+    placeDirectCustomerLog(payload)
+      .then((res) => {
         if (res.data.status === 1) {
           toast.success("Direct order placed successfully!");
           resetForm();
@@ -87,14 +110,15 @@ const PlaceDirectOrder: React.FC = () => {
         } else {
           toast.error(res.data.msg || "Failed to place order.");
         }
-      } catch {
+      })
+      .catch(() => {
         toast.error("Something went wrong while placing the order.");
-      } finally {
+      })
+      .finally(() => {
         hideLoader();
         setSubmitting(false);
-      }
-    },
-  });
+      });
+  };
 
   const quantity =
     (activeSlot?.id === 1
