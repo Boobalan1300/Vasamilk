@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+
 import { useToken } from "../../../Hooks/UserHook";
 import {
   fetchUserById,
@@ -19,7 +19,7 @@ import {
 import CustomDropDown from "../../../Components/CustomDropDown";
 import CustomButton from "../../../Components/Button";
 import FormField from "../../../Components/InputField";
-import { Card, Col, Row, Select, Image } from "antd";
+import { Card, Col, Row, Select, Image, Spin } from "antd";
 import { Images } from "../../../Utils/Images";
 
 const paymentTypes = [
@@ -27,7 +27,7 @@ const paymentTypes = [
   { label: "Online", value: "online" },
 ];
 
-const directOrderValidationSchema = Yup.object({
+const validationSchema = Yup.object({
   customers: Yup.string().required("Customer is required"),
   transactionId: Yup.string().when("paymentType", {
     is: "online",
@@ -36,15 +36,14 @@ const directOrderValidationSchema = Yup.object({
   }),
 });
 
-
 const PlaceDirectOrder: React.FC = () => {
   const token = useToken();
-  const navigate = useNavigate();
+ 
 
   const [customersList, setCustomersList] = useState<any[]>([]);
   const [userDetails, setUserDetails] = useState<any>(null);
   const [activeSlot, setActiveSlot] = useState<any | null>(null);
-  const [loadingSlotStatus, setLoadingSlotStatus] = useState(true);
+  const [loadingSlot, setLoadingSlot] = useState(true);
 
   const {
     values,
@@ -55,6 +54,7 @@ const PlaceDirectOrder: React.FC = () => {
     handleBlur,
     errors,
     touched,
+    resetForm,
   } = useFormik({
     initialValues: {
       customers: "",
@@ -63,176 +63,123 @@ const PlaceDirectOrder: React.FC = () => {
       transactionId: "",
       paymentType: "cash",
     },
-     validationSchema: directOrderValidationSchema,
-    onSubmit: (values, { setSubmitting, resetForm }) => {
-      handlePlaceOrder(
-        values,
-        resetForm,
-        setUserDetails,
-        setSubmitting,
-      );
-    },
-  });
+    validationSchema,
+    onSubmit: async (vals, { setSubmitting }) => {
+      if (!token || !userDetails || !activeSlot) return;
 
-  const handlePlaceOrder = (
-    values: any,
+      const quantity =
+        activeSlot.id === 1
+          ? Number(vals.morningQuantity)
+          : Number(vals.eveningQuantity);
 
-    
-    resetForm: () => void,
-    setUserDetails: (val: any) => void,
-    setSubmitting: (val: boolean) => void,
-   
-  ) => {
-    if (!token || !userDetails || !activeSlot?.id) return;
+      const payload = {
+        token,
+        customer_id: userDetails.user_id,
+        quantity,
+        is_paid: 1,
+        payment_type: vals.paymentType === "cash" ? 1 : 2,
+        transaction_id: vals.transactionId || "",
+      };
 
-    const quantity =
-      (activeSlot.id === 1
-        ? Number(values.morningQuantity)
-        : Number(values.eveningQuantity)) || 0;
-
-    const payload = {
-      token,
-      customer_id: userDetails.user_id,
-      quantity,
-      is_paid: 1,
-      payment_type: values.paymentType === "cash" ? 1 : 2,
-      transaction_id: values.transactionId || "",
-    };
-
-    showLoader();
-
-    placeDirectCustomerLog(payload)
-      .then((res) => {
+      showLoader();
+      try {
+        const res = await placeDirectCustomerLog(payload);
         if (res.data.status === 1) {
-          toast.success("Direct order placed successfully!");
+          toast.success("Order placed successfully!");
           resetForm();
           setUserDetails(null);
         } else {
           toast.error(res.data.msg || "Failed to place order.");
         }
-      })
-      .catch(() => {
-        toast.error("Something went wrong while placing the order.");
-      })
-      .finally(() => {
+      } catch {
+        toast.error("Error placing the order.");
+      } finally {
         hideLoader();
         setSubmitting(false);
-      });
-  };
+      }
+    },
+  });
 
   const quantity =
-    (activeSlot?.id === 1
+    activeSlot?.id === 1
       ? Number(values.morningQuantity)
       : activeSlot?.id === 2
       ? Number(values.eveningQuantity)
-      : 0) || 0;
+      : 0;
 
   const totalAmount = quantity * (userDetails?.unit_price ?? 0);
 
-  const hasMorningSlotToday =
-    userDetails?.today_slot_data?.some((s: any) => s.slot_id === 1) ?? false;
-  const hasEveningSlotToday =
-    userDetails?.today_slot_data?.some((s: any) => s.slot_id === 2) ?? false;
+  const hasMorning = userDetails?.today_slot_data?.some(
+    (s: any) => s.slot_id === 1
+  );
+  const hasEvening = userDetails?.today_slot_data?.some(
+    (s: any) => s.slot_id === 2
+  );
 
-  const isSlotAvailableForCustomer =
-    (activeSlot?.id === 1 && hasMorningSlotToday) ||
-    (activeSlot?.id === 2 && hasEveningSlotToday);
+  const canPlace =
+    (activeSlot?.id === 1 && hasMorning) ||
+    (activeSlot?.id === 2 && hasEvening);
 
   useEffect(() => {
-    if (token) {
-      fetchActiveSlot(token);
-    }
-  }, [token]);
-
-  const fetchActiveSlot = (token: string) => {
-    setLoadingSlotStatus(true);
-
-    const formData = new FormData();
-    formData.append("token", token);
-
-    getActiveSlot(formData)
+    if (!token) return;
+    const fd = new FormData();
+    fd.append("token", token);
+    getActiveSlot(fd)
       .then((res) => {
-        if (res.data.status === 1) {
+        if (res.data.status === 1 && res.data.data?.id) {
           setActiveSlot(res.data.data);
         } else {
           setActiveSlot(null);
         }
       })
-      .catch(() => {
-        setActiveSlot(null);
-      })
-      .finally(() => {
-        setLoadingSlotStatus(false);
-      });
-  };
+      .catch(() => setActiveSlot(null))
+      .finally(() => setLoadingSlot(false));
+  }, [token]);
 
   useEffect(() => {
-    if (values.customers) fetchAndSetCustomerDetails(values.customers);
-  }, [values.customers]);
-
-  const fetchAndSetCustomerDetails = (customerId: string) => {
-    const selectedCustomer = customersList.find(
-      (c) => String(c.user_id) === String(customerId)
+    if (!values.customers) return setUserDetails(null);
+    const cust = customersList.find(
+      (c) => String(c.user_id) === values.customers
     );
-    if (!selectedCustomer || !token) {
-      setUserDetails(null);
-      return;
-    }
+    if (!cust || !token) return setUserDetails(null);
 
     showLoader();
-    const formData = new FormData();
-    formData.append("token", token);
-    formData.append("user_id", customerId);
-
-    fetchUserById(formData)
+    const fd = new FormData();
+    fd.append("token", token);
+    fd.append("user_id", values.customers);
+    fetchUserById(fd)
       .then((res) => {
         if (res.data.status === 1) {
-          const fetchedData = res.data.data || {};
-          setUserDetails({
-            ...fetchedData,
-            unit_price: selectedCustomer.unit_price,
-          });
-
+          const data = res.data.data || {};
+          setUserDetails({ ...data, unit_price: cust.unit_price });
           setFieldValue("morningQuantity", "");
           setFieldValue("eveningQuantity", "");
-
-          (fetchedData.today_slot_data || []).forEach((slot: any) => {
+          (data.today_slot_data || []).forEach((slot: any) => {
             if (slot.slot_id === 1)
               setFieldValue("morningQuantity", slot.quantity);
             if (slot.slot_id === 2)
               setFieldValue("eveningQuantity", slot.quantity);
           });
         } else {
-          toast.error(res.data.msg || "Failed to fetch customer details");
+          toast.error(res.data.msg || "Failed to load customer");
           setUserDetails(null);
         }
       })
       .catch(() => {
-        toast.error("Something went wrong while fetching user details");
+        toast.error("Error fetching customer");
         setUserDetails(null);
       })
       .finally(() => hideLoader());
-  };
+  }, [values.customers, customersList, token, setFieldValue]);
 
-  const renderSlotAlertMessage = () => {
-    if (loadingSlotStatus) return null;
-
-    if (!activeSlot?.id) {
-      return (
-        <div className="alert alert-warning text-center mb-3">
-          There is no active inventory slot for today.
-        </div>
-      );
-    }
-  };
-
+  // Render
   return (
     <div className="container py-3">
       <h4 className="mb-4">Place Direct Order</h4>
 
-      {renderSlotAlertMessage()}
-
-      {activeSlot?.id && (
+      {loadingSlot ? (
+        <Spin />
+      ) : activeSlot ? (
         <form onSubmit={handleSubmit}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
@@ -244,170 +191,142 @@ const PlaceDirectOrder: React.FC = () => {
                 onCustomersLoaded={setCustomersList}
               />
             </Col>
+          </Row>
 
-            <Col xs={24} className="d-flex justify-content-between mb-2">
-              <span
-                onClick={() => navigate("/createUser")}
-                style={{ cursor: "pointer", color: "#1677ff" }}
-              >
-                Add New User
-              </span>
-            </Col>
+          {userDetails && (
+            <Card
+              title={`Customer Details (${activeSlot.name})`}
+              className="shadow-sm mb-4"
+            >
+              <Row gutter={[16, 16]}>
+                <Col xs={24} sm={12} md={8}>
+                  <label className="fw-semibold">Name:</label>
+                  <p className="mb-0">{userDetails.name || "-"}</p>
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                  <label className="fw-semibold">Phone:</label>
+                  <p className="mb-0">{userDetails.phone || "-"}</p>
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                  <label className="fw-semibold">Email:</label>
+                  <p className="mb-0">{userDetails.email || "-"}</p>
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                  <label className="fw-semibold">Line:</label>
+                  <p className="mb-0">{userDetails.line_name ?? "-"}</p>
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                  <label className="fw-semibold">Pay Type:</label>
+                  <p className="mb-0">
+                    {PayTypesOptions.find(
+                      (p) => p.value === userDetails.pay_type
+                    )?.label || "-"}
+                  </p>
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                  <label className="fw-semibold">Customer Type:</label>
+                  <p className="mb-0">
+                    {CustomerType.find(
+                      (c) => c.value === userDetails.customer_type
+                    )?.label || "-"}
+                  </p>
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                  <label className="fw-semibold">Unit Price:</label>
+                  <p className="mb-0">₹{userDetails.unit_price ?? "-"}</p>
+                </Col>
+              </Row>
+              <Row gutter={[16, 16]} className="mt-3">
+                {activeSlot.id === 1 ? (
+                  hasMorning ? (
+                    <FormField
+                      label="Morning Qty"
+                      name="morningQuantity"
+                      placeholder="Enter morning quantity"
+                      type="number"
+                      value={values.morningQuantity}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={errors.morningQuantity}
+                      touched={touched.morningQuantity}
+                    />
+                  ) : (
+                    <p className="text-danger">No Morning Slot</p>
+                  )
+                ) : hasEvening ? (
+                  <FormField
+                    label="Evening Qty"
+                    name="eveningQuantity"
+                    placeholder="Enter evening quantity"
+                    type="number"
+                    value={values.eveningQuantity}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={errors.eveningQuantity}
+                    touched={touched.eveningQuantity}
+                  />
+                ) : (
+                  <p className="text-danger">No Evening Slot</p>
+                )}
+              </Row>
 
-            {userDetails && (
-              <Col xs={24}>
-                <Card
-                  className="mb-4"
-                  title={`Customer Details (${activeSlot.name})`}
-                >
-                  <Row gutter={[16, 16]}>
-                    <Col xs={24} sm={12} md={8}>
-                      <strong>Name:</strong>
-                      <p>{userDetails.name || "-"}</p>
-                    </Col>
-                    <Col xs={24} sm={12} md={8}>
-                      <strong>Phone:</strong>
-                      <p>{userDetails.phone || "-"}</p>
-                    </Col>
-                    <Col xs={24} sm={12} md={8}>
-                      <strong>Email:</strong>
-                      <p>{userDetails.email || "-"}</p>
-                    </Col>
-                    <Col xs={24} sm={12} md={8}>
-                      <strong>Line:</strong>
-                      <p>{userDetails.line_name ?? "-"}</p>
-                    </Col>
-                    <Col xs={24} sm={12} md={8}>
-                      <strong>Pay Type:</strong>
-                      <p>
-                        {PayTypesOptions.find(
-                          (p) => p.value === userDetails.pay_type
-                        )?.label || "-"}
-                      </p>
-                    </Col>
-                    <Col xs={24} sm={12} md={8}>
-                      <strong>Customer Type:</strong>
-                      <p>
-                        {CustomerType.find(
-                          (c) => c.value === userDetails.customer_type
-                        )?.label || "-"}
-                      </p>
-                    </Col>
-                    <Col xs={24} sm={12} md={8}>
-                      <strong>Unit Price:</strong>
-                      <p>Rs.{userDetails.unit_price ?? "-"}</p>
-                    </Col>
-                  </Row>
+              <p className="mt-3">
+                <strong>Total:</strong> ₹{totalAmount.toFixed(2)}
+              </p>
 
-                  <Row gutter={[16, 16]}>
-                    {activeSlot.id === 1 && (
-                      <Col xs={24} sm={12}>
-                        {hasMorningSlotToday ? (
-                          <FormField
-                            label="Morning Quantity"
-                            type="number"
-                            name="morningQuantity"
-                            value={values.morningQuantity}
-                            placeholder="Enter morning quantity"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={errors.morningQuantity}
-                            touched={touched.morningQuantity}
-                          />
-                        ) : (
-                          <p className="text-danger">
-                            No Morning Slot Available for this customer
-                          </p>
-                        )}
-                      </Col>
-                    )}
-                    {activeSlot.id === 2 && (
-                      <Col xs={24} sm={12}>
-                        {hasEveningSlotToday ? (
-                          <FormField
-                            label="Evening Quantity"
-                            type="number"
-                            name="eveningQuantity"
-                            value={values.eveningQuantity}
-                            placeholder="Enter evening quantity"
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            error={errors.eveningQuantity}
-                            touched={touched.eveningQuantity}
-                          />
-                        ) : (
-                          <p className="text-danger">
-                            No Evening Slot Available for this customer
-                          </p>
-                        )}
-                      </Col>
-                    )}
-                  </Row>
+              {canPlace && (
+                <Row gutter={[16, 16]} className="mt-3">
+                  <Col xs={24} sm={12} md={6}>
+                    <label className="form-label">Payment Type</label>
+                    <Select
+                      value={values.paymentType}
+                      onChange={(v) => setFieldValue("paymentType", v)}
+                      options={paymentTypes}
+                      className="w-100"
+                    />
+                  </Col>
 
-                  {quantity > 0 && (
-                    <Row className="mt-3">
-                      <Col>
-                        <strong>Total Amount:</strong> ₹{totalAmount.toFixed(2)}
-                      </Col>
-                    </Row>
-                  )}
-
-                  {isSlotAvailableForCustomer && (
-                    <Row gutter={[16, 16]} className="mt-3">
-                      <Col xs={24} sm={12}>
-                        <label className="form-label">Payment Type</label>
-                        <Select
-                          value={values.paymentType}
-                          onChange={(val) => setFieldValue("paymentType", val)}
-                          style={{ width: "100%" }}
-                          options={paymentTypes}
+                  {values.paymentType === "online" && (
+                    <>
+                      <Col xs={24}>
+                        <label className="form-label">Scan QR Code</label>
+                        <br />
+                        <Image
+                          src={Images.QRcode}
+                          width={200}
+                          alt="QR"
+                          style={{ display: "block", marginBottom: 8 }}
                         />
                       </Col>
-
-                      {values.paymentType === "online" && (
-                        <>
-                          <Col xs={24}>
-                            <label className="form-label">Scan QR Code</label>
-                            <br />
-                            <Image
-                              width={200}
-                              src={Images.QRcode}
-                              alt="QR Code"
-                            />
-                          </Col>
-                          <Col xs={24} sm={12}>
-                            <FormField
-                              label="Transaction ID"
-                              name="transactionId"
-                              placeholder="Enter transaction ID"
-                              value={values.transactionId}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              error={errors.transactionId}
-                              touched={touched.transactionId}
-                            />
-                          </Col>
-                        </>
-                      )}
-                    </Row>
+                      <Col xs={24} sm={12} md={6}>
+                        <FormField
+                          label="Transaction ID"
+                          name="transactionId"
+                          placeholder="Enter transaction ID"
+                          value={values.transactionId}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          error={errors.transactionId}
+                          touched={touched.transactionId}
+                        />
+                      </Col>
+                    </>
                   )}
-                </Card>
-              </Col>
-            )}
+                </Row>
+              )}
+            </Card>
+          )}
 
-            {isSlotAvailableForCustomer && (
-              <Col xs={24}>
-                <CustomButton
-                  type="submit"
-                  className="btn btn-success"
-                  disabled={isSubmitting}
-                >
-                  Place Order
-                </CustomButton>
-              </Col>
-            )}
-          </Row>
+          {canPlace && (
+            <CustomButton type="submit"   className="btn btn-success" disabled={isSubmitting}>
+              Place Order
+            </CustomButton>
+          )}
         </form>
+      ) : (
+        <div className="alert alert-warning">
+          No active inventory slot today.
+        </div>
       )}
     </div>
   );

@@ -100,10 +100,7 @@ export const GetMilkDailyReport = (formData: FormData) => {
 };
 
 
-// not used
-export const GetVendorMilkReport = (formData: FormData) => {
-  return axios.post("/milk-api/dashboard/vendor-milk-report", formData);
-};
+
 
 
 export const GetDistributorLines =(formData:FormData)=>{
@@ -271,7 +268,10 @@ export const placeDirectCustomerLog = (payload: any) => {
 
 // -------------------------- sales ------------------------------------
 
-// GetVendorMilkReport
+export const GetVendorMilkReport = (formData: FormData) => {
+  return axios.post("/milk-api/dashboard/vendor-milk-report", formData);
+};
+
 
 export const GetDistributorInventoryLog = ( page=1, size=50,formData: FormData) => {
   return axios.post(

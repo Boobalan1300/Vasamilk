@@ -31,8 +31,8 @@ export const CustomerType = [
 ];
 
 export const PayTypesOptions = [
-  { label: "Daily", value: 1 },
-  { label: "Monthly", value: 2 },
+  { label: "Daily", value: "1" },
+  { label: "Monthly", value: "2" },
 ];
 
 const StatusOptions = [
