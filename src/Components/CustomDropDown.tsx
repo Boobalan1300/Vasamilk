@@ -1,3 +1,6 @@
+
+
+
 import { useEffect, useState } from "react";
 import { Select, message } from "antd";
 import {
@@ -16,6 +19,7 @@ interface ReusableDropdownsProps {
   className?: string;
   customerType?: "1" | "2" | "3" | "4";
   onCustomersLoaded?: (customers: any[]) => void; 
+  
 }
 
 const UserDropDown = [
@@ -160,54 +164,54 @@ const CustomDropDown: React.FC<ReusableDropdownsProps> = ({
       .finally(() => setLoadingCustomers(false));
   };
 
-  const renderSelect = (
-    name: string,
-    placeholder: string,
-    options: any[],
-    loading: boolean = false
-  ) => (
-    <div className={className} key={name}>
-      <label>{placeholder}</label>
-      <Select
-        allowClear
-        style={{ width: "100%" }}
-        className={`${errors[name] && touched[name] ? "is-invalid" : ""}`}
-        value={values[name] || undefined}
-        placeholder={`Select ${placeholder.toLowerCase()}`}
-        loading={loading}
-        onChange={(val) => setFieldValue(name, val ?? "")}
-        // onBlur={() => handleBlur({ target: { name } })}
-        onBlur={() => formik?.handleBlur?.({ target: { name } })}
-
-        showSearch
-        optionFilterProp="children"
-        filterOption={(input, option) =>
+const renderSelect = (
+  name: string,
+  placeholder: string,
+  options: any[],
+  loading: boolean = false
+) => (
+  <div className={className} key={name}>
+    <label>{placeholder}</label>
+    <Select
+      allowClear
+      style={{ width: "100%" }}
+      className={`${errors[name] && touched[name] ? "is-invalid" : ""}`}
+      value={values[name] ? String(values[name]) : undefined} // 👈 Stringified value
+      placeholder={`Select ${placeholder.toLowerCase()}`}
+      loading={loading}
+      onChange={(val) => setFieldValue(name, val ?? "")}
+      onBlur={() => formik?.handleBlur?.({ target: { name } })}
+      showSearch
+      optionFilterProp="children"
+     filterOption={(input, option) =>
           (option?.children as unknown as string)
             .toLowerCase()
             .includes(input.toLowerCase())
         }
-      >
-        {options
-          .filter(
-            (opt, idx, self) =>
-              opt.value !== undefined &&
-              idx ===
-                self.findIndex((o) => String(o.value) === String(opt.value))
-          )
-          .map((opt, idx) => (
-            <Option
-              key={String(opt.value ?? `${name}-${idx}`)}
-              value={opt.value ?? `${name}-${idx}`}
-            >
-              {opt.label}
-            </Option>
-          ))}
-      </Select>
-      {errors[name] && touched[name] && typeof errors[name] === "string" && (
-        <div className="text-danger">{errors[name]}</div>
-      )}
-    </div>
-  );
+    >
+      {options
+        .filter(
+          (opt, idx, self) =>
+            opt.value !== undefined &&
+            idx === self.findIndex(
+              (o) => String(o.value) === String(opt.value)
+            )
+        )
+        .map((opt, idx) => (
+          <Option
+            key={String(opt.value ?? `${name}-${idx}`)}
+            value={String(opt.value ?? `${name}-${idx}`)} 
+          >
+            {opt.label}
+          </Option>
+        ))}
+    </Select>
+    {errors[name] && touched[name] && typeof errors[name] === "string" && (
+      <div className="text-danger">{errors[name]}</div>
+    )}
+  </div>
+);
+
 
   return (
     <div className="row mt-3">

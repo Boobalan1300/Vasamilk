@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -38,13 +36,13 @@ const validationSchema = Yup.object({
 
 const PlaceDirectOrder: React.FC = () => {
   const token = useToken();
- 
 
   const [customersList, setCustomersList] = useState<any[]>([]);
   const [userDetails, setUserDetails] = useState<any>(null);
   const [activeSlot, setActiveSlot] = useState<any | null>(null);
   const [loadingSlot, setLoadingSlot] = useState(true);
 
+  console.log(userDetails);
   const {
     values,
     handleSubmit,
@@ -172,7 +170,6 @@ const PlaceDirectOrder: React.FC = () => {
       .finally(() => hideLoader());
   }, [values.customers, customersList, token, setFieldValue]);
 
-  // Render
   return (
     <div className="container py-3">
       <h4 className="mb-4">Place Direct Order</h4>
@@ -219,10 +216,11 @@ const PlaceDirectOrder: React.FC = () => {
                   <label className="fw-semibold">Pay Type:</label>
                   <p className="mb-0">
                     {PayTypesOptions.find(
-                      (p) => p.value === userDetails.pay_type
+                      (p) => p.value === String(userDetails.pay_type)
                     )?.label || "-"}
                   </p>
                 </Col>
+
                 <Col xs={24} sm={12} md={8}>
                   <label className="fw-semibold">Customer Type:</label>
                   <p className="mb-0">
@@ -318,7 +316,11 @@ const PlaceDirectOrder: React.FC = () => {
           )}
 
           {canPlace && (
-            <CustomButton type="submit"   className="btn btn-success" disabled={isSubmitting}>
+            <CustomButton
+              type="submit"
+              className="btn btn-success"
+              disabled={isSubmitting}
+            >
               Place Order
             </CustomButton>
           )}

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
@@ -245,8 +244,8 @@ const CreateUser = () => {
           alternative_number: data.alternative_number || "",
           user_type: String(data.user_type || ""),
           customer_type: (data.customer_type || ""),
-          line_id: String(data.line_name || ""),
-          price_tag_id: String(data.price_tag_name || ""),
+         line_id: data.line_id ? String(data.line_id) : "",
+  price_tag_id: data.price_tag_id ? String(data.price_tag_id) : "",
           pay_type: data.pay_type != null ? String(data.pay_type) : "",
           slot_data: data.slot_data || [
             { slot_id: 1, quantity: "", method: "", start_date: "" },
