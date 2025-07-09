@@ -73,7 +73,7 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
             label: "Distributor",
             onClick: () => navigate("/distributorList"),
           },
-          
+
           {
             key: "3",
             icon: <img src={Images.user} className="iconStyle" alt="users" />,
@@ -109,22 +109,20 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
               },
             ],
           },
-           {
+          {
             key: "sales",
-            icon: (
-              <img
-                src={Images.sales}
-                className="iconStyle"
-                alt="sales"
-              />
-            ),
+            icon: <img src={Images.sales} className="iconStyle" alt="sales" />,
             label: "Sales",
             onClick: () => navigate("/sales"),
           },
           {
             key: "place-order",
             icon: (
-              <img src={Images.placeOrder} className="iconStyle" alt="place order" />
+              <img
+                src={Images.placeOrder}
+                className="iconStyle"
+                alt="place order"
+              />
             ),
             label: "Place Order",
             onClick: () => navigate("/placeOrder"),
@@ -170,8 +168,22 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
         <Button
           icon={<MenuOutlined />}
           onClick={() => setDrawerVisible(true)}
-          style={{ margin: 10 }}
-        />
+          style={{
+            position: "absolute",
+            top: 10,
+            right: 10,
+            zIndex: 1000,
+            background: "#EDE7F6",
+            color: "#000",
+            border: "none",
+            padding: "6px 12px",
+            height: "auto",
+          }}
+          type="primary"
+        >
+          Menu
+        </Button>
+
         <Drawer
           title="Menu"
           placement="right"
@@ -179,6 +191,7 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed, onToggle }) => {
           onClose={() => setDrawerVisible(false)}
           open={drawerVisible}
           bodyStyle={{ padding: 0 }}
+          width={220}
         >
           {MenuComponent}
         </Drawer>

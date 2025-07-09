@@ -17,7 +17,7 @@ const CustomPagination = ({
 }: CustomPaginationProps) => {
   return (
     <Pagination
-    className="mb-5 sm:mb-0" 
+    // className="mb-5 sm:mb-0" 
       current={current}
       pageSize={pageSize}
       total={total}
