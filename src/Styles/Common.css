@@ -61,7 +61,7 @@
   background-color: var(--error-bg) !important;
   color: white !important;
   border-radius: 20px !important;
-  border: none !important;
+  
   transition: all 0.3s ease;
 }
 
@@ -71,3 +71,13 @@
   border-color: var(--text-white) !important;
   transform: scale(1.05);
 }
+
+
+.light-grey-button {
+  font-size: 14px;
+  background-color:#79b0f4;
+  color: var(--text-white);
+  border: none !important;
+}
+
+

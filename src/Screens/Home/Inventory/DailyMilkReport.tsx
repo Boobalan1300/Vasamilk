@@ -66,14 +66,14 @@ const DailyMilkReport = () => {
     slotId: number,
     givenType: number
   ) => (
-    <Col xs={24} md={12} lg={6}>
+    <Col xs={24} md={12} lg={12} xl={6}>
       <Card
         title={<Tag color={color}>{title}</Tag>}
         
         hoverable
         extra={
           <CustomButton
-            className="btn-grey px-2 py-1"
+            className=" px-1 py-1 light-grey-button"
             onClick={() =>
               navigate("/listslotMap", { state: { slotId, givenType } })
             }
