@@ -191,128 +191,148 @@ const PlaceDirectOrder: React.FC = () => {
           </Row>
 
           {userDetails && (
-            <Card
-              title={`Customer Details (${activeSlot.name})`}
-              className="shadow-sm mb-4"
-            >
-              <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} md={8}>
-                  <label className="fw-semibold">Name:</label>
-                  <p className="mb-0">{userDetails.name || "-"}</p>
-                </Col>
-                <Col xs={24} sm={12} md={8}>
-                  <label className="fw-semibold">Phone:</label>
-                  <p className="mb-0">{userDetails.phone || "-"}</p>
-                </Col>
-                <Col xs={24} sm={12} md={8}>
-                  <label className="fw-semibold">Email:</label>
-                  <p className="mb-0">{userDetails.email || "-"}</p>
-                </Col>
-                <Col xs={24} sm={12} md={8}>
-                  <label className="fw-semibold">Line:</label>
-                  <p className="mb-0">{userDetails.line_name ?? "-"}</p>
-                </Col>
-                <Col xs={24} sm={12} md={8}>
-                  <label className="fw-semibold">Pay Type:</label>
-                  <p className="mb-0">
-                    {PayTypesOptions.find(
-                      (p) => p.value === String(userDetails.pay_type)
-                    )?.label || "-"}
-                  </p>
-                </Col>
+<Card
+  title={
+    <div className="fs-5 fw-bold text-white bg-primary px-3 py-2 rounded">
+      Customer Details ({activeSlot.name})
+    </div>
+  }
+  className="shadow-sm mb-4 border-0"
+  bodyStyle={{ backgroundColor: "#f8f9fa", padding: "1.5rem" }} // Bootstrap's light gray
+>
+  <Row gutter={[16, 16]}>
+    <Col xs={24} sm={12} md={8}>
+      <div className="bg-white p-3 rounded shadow-sm h-100">
+        <label className="fw-semibold text-secondary">Name:</label>
+        <p className="mb-0">{userDetails.name || "-"}</p>
+      </div>
+    </Col>
+    <Col xs={24} sm={12} md={8}>
+      <div className="bg-white p-3 rounded shadow-sm h-100">
+        <label className="fw-semibold text-secondary">Phone:</label>
+        <p className="mb-0">{userDetails.phone || "-"}</p>
+      </div>
+    </Col>
+    <Col xs={24} sm={12} md={8}>
+      <div className="bg-white p-3 rounded shadow-sm h-100">
+        <label className="fw-semibold text-secondary">Email:</label>
+        <p className="mb-0">{userDetails.email || "-"}</p>
+      </div>
+    </Col>
+    <Col xs={24} sm={12} md={8}>
+      <div className="bg-white p-3 rounded shadow-sm h-100">
+        <label className="fw-semibold text-secondary">Line:</label>
+        <p className="mb-0">{userDetails.line_name ?? "-"}</p>
+      </div>
+    </Col>
+    <Col xs={24} sm={12} md={8}>
+      <div className="bg-white p-3 rounded shadow-sm h-100">
+        <label className="fw-semibold text-secondary">Pay Type:</label>
+        <p className="mb-0">
+          {PayTypesOptions.find((p) => p.value === String(userDetails.pay_type))?.label || "-"}
+        </p>
+      </div>
+    </Col>
+    <Col xs={24} sm={12} md={8}>
+      <div className="bg-white p-3 rounded shadow-sm h-100">
+        <label className="fw-semibold text-secondary">Customer Type:</label>
+        <p className="mb-0">
+          {CustomerType.find((c) => c.value === userDetails.customer_type)?.label || "-"}
+        </p>
+      </div>
+    </Col>
+    <Col xs={24} sm={12} md={8}>
+      <div className="bg-white p-3 rounded shadow-sm h-100">
+        <label className="fw-semibold text-secondary">Unit Price:</label>
+        <p className="mb-0">₹{userDetails.unit_price ?? "-"}</p>
+      </div>
+    </Col>
+  </Row>
 
-                <Col xs={24} sm={12} md={8}>
-                  <label className="fw-semibold">Customer Type:</label>
-                  <p className="mb-0">
-                    {CustomerType.find(
-                      (c) => c.value === userDetails.customer_type
-                    )?.label || "-"}
-                  </p>
-                </Col>
-                <Col xs={24} sm={12} md={8}>
-                  <label className="fw-semibold">Unit Price:</label>
-                  <p className="mb-0">₹{userDetails.unit_price ?? "-"}</p>
-                </Col>
-              </Row>
-              <Row gutter={[16, 16]} className="mt-3">
-                {activeSlot.id === 1 ? (
-                  hasMorning ? (
-                    <FormField
-                      label="Morning Qty"
-                      name="morningQuantity"
-                      placeholder="Enter morning quantity"
-                      type="number"
-                      value={values.morningQuantity}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={errors.morningQuantity}
-                      touched={touched.morningQuantity}
-                    />
-                  ) : (
-                    <p className="text-danger">No Morning Slot</p>
-                  )
-                ) : hasEvening ? (
-                  <FormField
-                    label="Evening Qty"
-                    name="eveningQuantity"
-                    placeholder="Enter evening quantity"
-                    type="number"
-                    value={values.eveningQuantity}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={errors.eveningQuantity}
-                    touched={touched.eveningQuantity}
-                  />
-                ) : (
-                  <p className="text-danger">No Evening Slot</p>
-                )}
-              </Row>
+  <Row gutter={[16, 16]} className="mt-4">
+    <Col span={24}>
+      <div className="bg-white p-3 rounded shadow-sm">
+        {activeSlot.id === 1 ? (
+          hasMorning ? (
+            <FormField
+              label="Morning Qty"
+              name="morningQuantity"
+              placeholder="Enter morning quantity"
+              type="number"
+              value={values.morningQuantity}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={errors.morningQuantity}
+              touched={touched.morningQuantity}
+            />
+          ) : (
+            <p className="text-danger fw-semibold mb-0">No Morning Slot</p>
+          )
+        ) : hasEvening ? (
+          <FormField
+            label="Evening Qty"
+            name="eveningQuantity"
+            placeholder="Enter evening quantity"
+            type="number"
+            value={values.eveningQuantity}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={errors.eveningQuantity}
+            touched={touched.eveningQuantity}
+          />
+        ) : (
+          <p className="text-danger fw-semibold mb-0">No Evening Slot</p>
+        )}
+      </div>
+    </Col>
+  </Row>
 
-              <p className="mt-3">
-                <strong>Total:</strong> ₹{totalAmount.toFixed(2)}
-              </p>
+  <div className="mt-4 bg-light p-3 rounded shadow-sm">
+    <strong className="me-2">Total:</strong> ₹{totalAmount.toFixed(2)}
+  </div>
 
-              {canPlace && (
-                <Row gutter={[16, 16]} className="mt-3">
-                  <Col xs={24} sm={12} md={6}>
-                    <label className="form-label">Payment Type</label>
-                    <Select
-                      value={values.paymentType}
-                      onChange={(v) => setFieldValue("paymentType", v)}
-                      options={paymentTypes}
-                      className="w-100"
-                    />
-                  </Col>
+  {canPlace && (
+    <Row gutter={[16, 16]} className="mt-4">
+      <Col xs={24} sm={12} md={6}>
+        <label className="form-label fw-semibold">Payment Type</label>
+        <Select
+          value={values.paymentType}
+          onChange={(v) => setFieldValue("paymentType", v)}
+          options={paymentTypes}
+          className="w-100"
+        />
+      </Col>
 
-                  {values.paymentType === "online" && (
-                    <>
-                      <Col xs={24}>
-                        <label className="form-label">Scan QR Code</label>
-                        <br />
-                        <Image
-                          src={Images.QRcode}
-                          width={200}
-                          alt="QR"
-                          style={{ display: "block", marginBottom: 8 }}
-                        />
-                      </Col>
-                      <Col xs={24} sm={12} md={6}>
-                        <FormField
-                          label="Transaction ID"
-                          name="transactionId"
-                          placeholder="Enter transaction ID"
-                          value={values.transactionId}
-                          onChange={handleChange}
-                          onBlur={handleBlur}
-                          error={errors.transactionId}
-                          touched={touched.transactionId}
-                        />
-                      </Col>
-                    </>
-                  )}
-                </Row>
-              )}
-            </Card>
+      {values.paymentType === "online" && (
+        <>
+          <Col xs={24}>
+            <label className="form-label fw-semibold">Scan QR Code</label>
+            <br />
+            <Image
+              src={Images.QRcode}
+              width={200}
+              alt="QR"
+              className="d-block mb-2 rounded border"
+            />
+          </Col>
+          <Col xs={24} sm={12} md={6}>
+            <FormField
+              label="Transaction ID"
+              name="transactionId"
+              placeholder="Enter transaction ID"
+              value={values.transactionId}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={errors.transactionId}
+              touched={touched.transactionId}
+            />
+          </Col>
+        </>
+      )}
+    </Row>
+  )}
+</Card>
+
           )}
 
           {canPlace && (

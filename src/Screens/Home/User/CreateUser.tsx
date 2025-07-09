@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
@@ -30,7 +31,7 @@ interface FormValues {
   alternative_number: string;
   password: string;
   user_type: string;
-  customer_type: number;
+  customer_type: string;
   line_id: string;
   price_tag_id: string;
   pay_type: string;
@@ -123,7 +124,7 @@ const CreateUser = () => {
       alternative_number: "",
       password: "",
       user_type: "",
-      customer_type: 0,
+      customer_type: "",
       line_id: "",
       price_tag_id: "",
       pay_type: "",
@@ -144,7 +145,7 @@ const CreateUser = () => {
     const token = useToken();
 
     const isCustomer = values.user_type === "5";
-    const isRegularCustomer = isCustomer && values.customer_type === 1;
+    const isRegularCustomer = isCustomer && values.customer_type === "1";
 
     const morningSlot = values.slot_data?.[0] || {};
     const eveningSlot = values.slot_data?.[1] || {};
@@ -193,7 +194,7 @@ const CreateUser = () => {
       ...(isEdit && id ? { id: parseInt(id) } : { password: values.password }),
 
       ...(isCustomer && {
-        customer_type: (values.customer_type),
+        customer_type: values.customer_type,
         line_id: parseInt(values.line_id),
         price_tag_id: parseInt(values.price_tag_id),
         pay_type: parseInt(values.pay_type),
@@ -243,9 +244,10 @@ const CreateUser = () => {
           phone: data.phone || "",
           alternative_number: data.alternative_number || "",
           user_type: String(data.user_type || ""),
-          customer_type: (data.customer_type || ""),
-         line_id: data.line_id ? String(data.line_id) : "",
-  price_tag_id: data.price_tag_id ? String(data.price_tag_id) : "",
+        customer_type: String(data.customer_type || ""),
+
+          line_id: data.line_id ? String(data.line_id) : "",
+          price_tag_id: data.price_tag_id ? String(data.price_tag_id) : "",
           pay_type: data.pay_type != null ? String(data.pay_type) : "",
           slot_data: data.slot_data || [
             { slot_id: 1, quantity: "", method: "", start_date: "" },
@@ -448,7 +450,7 @@ const CreateUser = () => {
               />
             </div>
 
-            {values.customer_type === 1 && (
+            {values.customer_type === "1" && (
               <>
                 {renderSlotField(0, "Morning Slot")}
                 {renderSlotField(1, "Evening Slot")}

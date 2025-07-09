@@ -30,8 +30,8 @@ const UserDropDown = [
 ];
 
 export const CustomerType = [
-  { label: "Regular", value: 1 },
-  { label: "Occasional", value: 2 },
+  { label: "Regular", value: "1" },
+  { label: "Occasional", value: "2" },
 ];
 
 export const PayTypesOptions = [
