@@ -136,7 +136,7 @@ const CustomerSlotCards: React.FC = () => {
                     <Card
                       size="small"
                       className="shadow-sm border-0 rounded-3 h-100"
-                      style={{ backgroundColor: "" }}
+                      
                     >
                       <div className="d-flex flex-column gap-2">
                         <h6 className="mb-0 fw-semibold text-grey">
@@ -203,9 +203,7 @@ const CustomerSlotCards: React.FC = () => {
         </Col>
       </Row>
 
-      <div style={{height:"1000px"}}>
-        klnasd
-      </div>
+      
     </div>
   );
 };
