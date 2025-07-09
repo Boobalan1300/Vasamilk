@@ -16,6 +16,7 @@ import PriceManagement from "../Screens/Home/Masters/PriceManagement";
 import ReasonManagement from "../Screens/Home/Masters/ReasonManagement";
 import PlaceDirectOrder from "../Screens/Home/Orders/PlaceDirectOrder";
 import Sales from "../Screens/Home/Sales/Sales";
+import CustomerDashboard from "../Screens/Home/Dashboards/CustomerDashboard";
 
 export const HomeRouter = [
   {
@@ -39,17 +40,13 @@ export const HomeRouter = [
           // Sales
            { path: "/sales", element: <Sales /> },
 
-
-
           // Masters
-
           { path: "/masters/slotManagement", element: <SlotManagement /> },
           { path: "/masters/linesManagement", element: <LinesManagement /> },
           { path: "/masters/priceManagement", element: <PriceManagement /> },
           { path: "/masters/reasonManagement", element: <ReasonManagement /> },
 
           // Orders
-
           { path:"/placeOrder",element:<PlaceDirectOrder/> }
         ],
       },
@@ -58,6 +55,13 @@ export const HomeRouter = [
         element: <PrivateRoute allowedUserTypes={[4]} />,
         children: [
           { path: "/distributorDashboard", element: <DistributorDashboard /> },
+        ],
+      },
+
+      {
+        element: <PrivateRoute allowedUserTypes={[5]} />,
+        children: [
+          { path: "/customerDashboard", element: <CustomerDashboard /> },
         ],
       },
     ],
