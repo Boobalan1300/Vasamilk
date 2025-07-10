@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -140,49 +141,52 @@ const AssignDistributor = () => {
     }
   }, [values.slots, values.slot_id, token]);
 
-  const fetchCustomersForSlots = (
-    slots: any[],
-    slotId: string,
-    token: string,
-    setLoadingCustomers: (fn: (prev: any) => any) => void,
-    setCustomers: (fn: (prev: any) => any) => void
-  ) => {
-    slots.forEach((slot, idx) => {
-      const shouldFetch = slot.assign_type && slot.line_id && slotId && token;
-      if (shouldFetch) {
-        setLoadingCustomers((prev) => ({ ...prev, [idx]: true }));
+const fetchCustomersForSlots = (
+  slots: any[],
+  slotId: string,
+  token: string,
+  setLoadingCustomers: (fn: (prev: any) => any) => void,
+  setCustomers: (fn: (prev: any) => any) => void
+) => {
+  slots.forEach((slot, idx) => {
+    const shouldFetch = slot.assign_type && slot.line_id && slotId && token;
+    if (shouldFetch) {
+      setLoadingCustomers((prev) => ({ ...prev, [idx]: true }));
 
-        const formData = new FormData();
-        formData.append("token", token);
-        formData.append("type", getCustomerType(slot.assign_type));
-        formData.append("line_id", slot.line_id);
-        formData.append("slot_id", slotId);
+      const formData = new FormData();
+      formData.append("token", token);
+      formData.append("type", getCustomerType(slot.assign_type));
+      formData.append("line_id", slot.line_id);
+      formData.append("slot_id", slotId);
 
-        GetCustomers(formData)
-          .then((res) => {
-            if (res.data.status === 1) {
-              const options = res.data.data.map((c: any) => ({
-                label: c.name,
-                value: String(c.slot_map_id),
-              }));
-              setCustomers((prev) => ({ ...prev, [idx]: options }));
-            } else {
-              toast.error(res.data.msg || "Failed to fetch customers");
-              setCustomers((prev) => ({ ...prev, [idx]: [] }));
-            }
-          })
-          .catch(() => {
-            toast.error("Something went wrong while fetching customers");
+      GetCustomers(formData)
+        .then((res) => {
+          if (res.data.status === 1) {
+            const options = res.data.data.map((c: any) => ({
+              label: c.name,
+              value: String(c.slot_map_id),
+            }));
+            setCustomers((prev) => ({ ...prev, [idx]: options }));
+          } else {
+            toast.error(res.data.msg || "Failed to fetch customers");
             setCustomers((prev) => ({ ...prev, [idx]: [] }));
-          })
-          .finally(() => {
-            setLoadingCustomers((prev) => ({ ...prev, [idx]: false }));
-          });
-      } else {
-        setCustomers((prev) => ({ ...prev, [idx]: [] }));
-      }
-    });
-  };
+          }
+        })
+        .catch(() => {
+          toast.error("Something went wrong while fetching customers");
+          setCustomers((prev) => ({ ...prev, [idx]: [] }));
+        })
+        .finally(() => {
+          setLoadingCustomers((prev) => ({ ...prev, [idx]: false }));
+        });
+    } else {
+     
+      setCustomers((prev) => ({ ...prev, [idx]: [] }));
+      setLoadingCustomers((prev) => ({ ...prev, [idx]: false }));
+    }
+  });
+};
+
 
   const getCustomerType = (assignType: string) => {
     if (assignType === "0") return "3";
@@ -256,8 +260,8 @@ const AssignDistributor = () => {
                 </Row>
 
                 {isTemporary && (
-                  <Row gutter={[16, 16]}>
-                    <Col xs={24} md={12}>
+                  <Row gutter={[16, 16]} className="my-3">
+                    <Col xs={24} md={12} >
                       <CustomDatePicker
                         label="From Date"
                         value={slot.from_date}
@@ -313,7 +317,7 @@ const AssignDistributor = () => {
                       </Row>
 
                       <Row gutter={[16, 16]}>
-                        <Col xs={24} md={12}>
+                        <Col xs={24} md={12} className="my-3">
                           <label>Customers</label>
                           <Spin spinning={loadingCustomers[idx]}>
                             <Select
